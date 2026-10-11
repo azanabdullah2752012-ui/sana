@@ -17,11 +17,27 @@
     <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Global Error Recovery Listener -->
+    <script>
+      window.addEventListener('error', function(e) {
+        var root = document.getElementById('root');
+        if (root && (!root.children || root.children.length === 0)) {
+          root.innerHTML = '<div style="min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#B6ACD0;background:#0C0A0E;text-align:center;">' +
+            '<div style="font-size:36px;margin-bottom:12px;">🌸</div>' +
+            '<h2 style="font-size:20px;color:#EDE7F7;margin:0 0 8px 0;font-weight:600;">Sana &amp; Azan Sanctuary</h2>' +
+            '<p style="font-size:12px;max-width:320px;line-height:1.6;margin:0 0 16px 0;opacity:0.8;">Connecting to the sanctuary... Tap below if loading pauses.</p>' +
+            '<button onclick="if(\'serviceWorker\' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(s){s.unregister();});});}if(\'caches\' in window){caches.keys().then(function(k){Promise.all(k.map(function(c){return caches.delete(c);})).then(function(){window.location.reload();});});}else{window.location.reload();}" style="padding:10px 22px;background:#E8638F;color:white;border:none;border-radius:16px;font-size:13px;cursor:pointer;font-weight:600;box-shadow:0 4px 14px rgba(232,99,143,0.35);">Refresh Sanctuary</button>' +
+            '</div>';
+        }
+      });
+    </script>
     <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-          navigator.serviceWorker.register('./sw.js').catch(function(err) {
+          navigator.serviceWorker.register('./sw.js').then(function(reg) {
+            reg.update();
+          }).catch(function(err) {
             console.warn('SW registration info:', err);
           });
         });
@@ -44,33 +60,9 @@
       })();
     </script>
     <script type="module" crossorigin src="./assets/app.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/icons.js">
-    <link rel="modulepreload" crossorigin href="./assets/vendor.js">
-    <link rel="modulepreload" crossorigin href="./assets/supabase.js">
     <link rel="stylesheet" crossorigin href="./assets/app.css">
   </head>
   <body class="bg-cream-100 text-cream-900 dark:bg-cozydark-950 dark:text-cream-100 antialiased selection:bg-blush-200 dark:selection:bg-blush-900 selection:text-blush-900 dark:selection:text-blush-100 min-h-screen">
     <div id="root"></div>
-    <script>
-      (function() {
-        // Fallback loader for static hosting (e.g. GitHub Pages serving repo root without build action)
-        if (
-          (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:') &&
-          !document.querySelector('script[src*="./assets/"]')
-        ) {
-          var link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.crossOrigin = 'anonymous';
-          link.href = './assets/app.css';
-          document.head.appendChild(link);
-
-          var script = document.createElement('script');
-          script.type = 'module';
-          script.crossOrigin = 'anonymous';
-          script.src = './assets/app.js';
-          document.body.appendChild(script);
-        }
-      })();
-    </script>
   </body>
 </html>

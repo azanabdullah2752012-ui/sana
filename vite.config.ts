@@ -21,11 +21,6 @@ export default defineConfig({
           }
           return 'assets/[name].[ext]';
         },
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          supabase: ['@supabase/supabase-js'],
-          icons: ['lucide-react'],
-        },
       },
     },
   },
