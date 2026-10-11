@@ -2,9 +2,7 @@
 
 A soft, cozy, and private sanctuary built for two friends using **React, Vite, TypeScript, Tailwind CSS, and Supabase**.
 
-Protected by secret passcodes:
-- ☕ **Azan's Passcode:** `azanisthebest`
-- 🌸 **Sana's Passcode:** `sanaisthebest`
+Protected by secret passcodes for Azan and Sana.
 
 **No email sign-up, no email confirmation links, and zero email rate limits.**
 
@@ -13,7 +11,7 @@ Protected by secret passcodes:
 ## ☕ Key Features
 
 ### 1. Landing Page & Welcoming Dashboard
-- **Secret Passcode Gate:** Enter `azanisthebest` or `sanaisthebest` to unlock your respective persona immediately.
+- **Secret Passcode Gate:** Enter your secret passcode to unlock your respective persona immediately.
 - **Partner Presence Card:** Real-time online/activity card showing partner's avatar, bio, and quick-chat shortcut.
 - **Home Hub:** Daily question glance, upcoming countdowns, recent scrapbook photos, and pinned notes.
 
