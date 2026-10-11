@@ -33,5 +33,26 @@
   </head>
   <body class="bg-cream-100 text-cream-900 dark:bg-cozydark-950 dark:text-cream-100 antialiased selection:bg-blush-200 dark:selection:bg-blush-900 selection:text-blush-900 dark:selection:text-blush-100 min-h-screen">
     <div id="root"></div>
+    <script>
+      (function() {
+        // Fallback loader for static hosting (e.g. GitHub Pages serving repo root without build action)
+        if (
+          (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:') &&
+          !document.querySelector('script[src*="./assets/"]')
+        ) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.crossOrigin = 'anonymous';
+          link.href = './assets/index-TLOwaM4b.css';
+          document.head.appendChild(link);
+
+          var script = document.createElement('script');
+          script.type = 'module';
+          script.crossOrigin = 'anonymous';
+          script.src = './assets/index-1vgfDDsm.js';
+          document.body.appendChild(script);
+        }
+      })();
+    </script>
   </body>
 </html>
