@@ -118,7 +118,7 @@ export const SpecialDatesView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className="px-3 py-1.5 rounded-xl text-xs text-cream-500 hover:bg-cream-200"
+              className="px-3 py-1.5 rounded-xl text-xs text-cream-500 dark:text-cream-400 hover:bg-cream-200 dark:hover:bg-cozydark-750 transition-colors"
             >
               Cancel
             </button>

@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, X, Smile, Sparkles } from 'lucide-react';
+import { Send, X, Smile, Sparkles, Film } from 'lucide-react';
 import { Message } from '../../types/database';
+import { StickerPickerModal } from './StickerPickerModal';
+import { GifPickerModal } from './GifPickerModal';
+import { encodeStickerMessage } from '../../lib/stickers';
+import { encodeGifMessage } from '../../lib/gifs';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
@@ -16,6 +20,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onCancelReply,
 }) => {
   const [content, setContent] = useState('');
+  const [stickerModalOpen, setStickerModalOpen] = useState(false);
+  const [gifModalOpen, setGifModalOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -54,7 +60,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="p-3 sm:p-4 bg-cream-50/90 dark:bg-cozydark-900/90 border-t border-cream-200/80 dark:border-cozydark-800/80 backdrop-blur-md">
+    <div className="p-2 sm:p-4 bg-cream-50/90 dark:bg-cozydark-900/90 border-t border-cream-200/80 dark:border-cozydark-800/80 backdrop-blur-md">
       {/* Replying Banner */}
       {replyingTo && (
         <div className="flex items-center justify-between px-3 py-2 mb-2 rounded-2xl bg-blush-50 dark:bg-blush-950/40 border border-blush-200 dark:border-blush-800/60 text-xs animate-slide-up">
@@ -76,9 +82,32 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       )}
 
       {/* Main Input Bar */}
-      <div className="flex items-end gap-2 bg-cream-100 dark:bg-cozydark-850 p-1.5 rounded-3xl border border-cream-300/80 dark:border-cozydark-800 shadow-sm focus-within:ring-2 focus-within:ring-blush-300/50 dark:focus-within:ring-blush-600/50 transition-all">
-        {/* Quick Emoji Bar */}
-        <div className="hidden sm:flex items-center pl-2 pb-1.5 gap-1">
+      <div className="flex items-end gap-1.5 sm:gap-2 bg-cream-100 dark:bg-cozydark-850 p-1.5 rounded-3xl border border-cream-300/80 dark:border-cozydark-800 shadow-sm focus-within:ring-2 focus-within:ring-blush-300/50 dark:focus-within:ring-blush-600/50 transition-all">
+        {/* Stickers & GIF Action Buttons */}
+        <div className="flex items-center pb-1 pl-1 gap-0.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setStickerModalOpen(true)}
+            className="p-2 rounded-full text-cream-500 dark:text-cream-400 hover:text-blush-600 dark:hover:text-blush-300 hover:bg-cream-200/80 dark:hover:bg-cozydark-750 transition-all active:scale-95"
+            title="Stickers & Custom Stickers"
+            aria-label="Open stickers"
+          >
+            <Sparkles className="w-4 h-4 text-blush-500" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setGifModalOpen(true)}
+            className="p-2 rounded-full text-cream-500 dark:text-cream-400 hover:text-blush-600 dark:hover:text-blush-300 hover:bg-cream-200/80 dark:hover:bg-cozydark-750 transition-all active:scale-95"
+            title="Search GIFs"
+            aria-label="Open GIF picker"
+          >
+            <Film className="w-4 h-4 text-lavender-500" />
+          </button>
+        </div>
+
+        {/* Quick Emoji Bar (Desktop) */}
+        <div className="hidden md:flex items-center pb-1.5 gap-1 border-l border-cream-200/80 dark:border-cozydark-750 pl-1.5">
           {QUICK_EMOJIS.map((emoji) => (
             <button
               key={emoji}
@@ -98,21 +127,39 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           value={content}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder="Write a little note or message... (Enter to send)"
+          placeholder="Write a message, share a sticker or GIF..."
           rows={1}
-          className="flex-1 bg-transparent px-3 py-2 text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none resize-none max-h-32"
+          className="flex-1 bg-transparent px-2.5 py-2 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none resize-none max-h-32"
         />
 
         {/* Send Button */}
         <button
           onClick={handleSend}
           disabled={!content.trim()}
-          className="p-2.5 rounded-full bg-blush-500 hover:bg-blush-600 disabled:opacity-40 disabled:hover:bg-blush-500 text-white transition-all shadow-sm shrink-0 flex items-center justify-center transform active:scale-95"
+          className="p-2.5 rounded-full bg-blush-500 hover:bg-blush-600 disabled:opacity-40 disabled:hover:bg-blush-500 text-white transition-all shadow-sm shrink-0 flex items-center justify-center transform active:scale-95 mb-0.5"
           aria-label="Send message"
         >
           <Send className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Stickers Modal */}
+      <StickerPickerModal
+        isOpen={stickerModalOpen}
+        onClose={() => setStickerModalOpen(false)}
+        onSelectSticker={(sticker) => {
+          onSendMessage(encodeStickerMessage(sticker));
+        }}
+      />
+
+      {/* GIF Picker Modal */}
+      <GifPickerModal
+        isOpen={gifModalOpen}
+        onClose={() => setGifModalOpen(false)}
+        onSelectGif={(gifUrl) => {
+          onSendMessage(encodeGifMessage(gifUrl));
+        }}
+      />
     </div>
   );
 };

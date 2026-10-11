@@ -27,7 +27,7 @@ const ACCENT_COLORS: { id: AccentColor; label: string; bg: string }[] = [
   { id: 'rose', label: 'Dusty Rose', bg: 'bg-[#F43F5E]' },
   { id: 'lavender', label: 'Lavender', bg: 'bg-[#BA9BF0]' },
   { id: 'violet', label: 'Royal Violet', bg: 'bg-[#8B5CF6]' },
-  { id: 'cream', label: 'Toasted Cream', bg: 'bg-[#DCC3AD]' },
+  { id: 'cream', label: 'Toasted Cream', bg: 'bg-[#B88E6D]' },
   { id: 'peach', label: 'Warm Peach', bg: 'bg-[#FB923C]' },
   { id: 'mint', label: 'Sage Mint', bg: 'bg-[#10B981]' },
   { id: 'sky', label: 'Soft Sky', bg: 'bg-[#0EA5E9]' },

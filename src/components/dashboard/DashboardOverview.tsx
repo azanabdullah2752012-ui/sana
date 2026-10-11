@@ -234,7 +234,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
           <button
             onClick={() => setActiveTab('activities')}
-            className="w-full py-2 rounded-xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 text-cream-700 dark:text-cream-300 text-xs font-medium text-center transition-colors"
+            className="w-full py-2 rounded-xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 dark:hover:bg-cozydark-800 text-cream-700 dark:text-cream-300 text-xs font-medium text-center transition-colors"
           >
             All Dates &amp; Milestones
           </button>
@@ -273,7 +273,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 className="group cursor-pointer rounded-3xl bg-cream-50 dark:bg-cozydark-900 border border-cream-200/80 dark:border-cozydark-800 overflow-hidden shadow-cozy hover:shadow-cozy-lg transition-all"
               >
                 {m.image_url ? (
-                  <div className="aspect-[16/10] overflow-hidden bg-cream-200">
+                  <div className="aspect-[16/10] overflow-hidden bg-cream-200 dark:bg-cozydark-800">
                     <img
                       src={m.image_url}
                       alt={m.title}

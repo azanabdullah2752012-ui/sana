@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Message } from '../../types/database';
 import { Avatar } from '../common/Avatar';
-import { Reply, MoreVertical, Edit2, Trash2, Smile, Check, X } from 'lucide-react';
+import { Reply, Edit2, Trash2, Smile, Check, X, Film, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
+import { parseStickerMessage } from '../../lib/stickers';
+import { parseGifMessage } from '../../lib/gifs';
 
 interface MessageItemProps {
   message: Message;
@@ -25,10 +27,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   onToggleReaction,
   currentUserId,
 }) => {
-  const [showMenu, setShowMenu] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
+
+  const stickerInfo = parseStickerMessage(message.content);
+  const gifInfo = parseGifMessage(message.content);
 
   const formatMessageTime = (dateStr: string) => {
     try {
@@ -45,6 +49,14 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     }
   };
 
+  const getReplyPreviewText = (content: string) => {
+    const s = parseStickerMessage(content);
+    if (s.isSticker) return `🏷️ Sticker: ${s.name || 'Custom'}`;
+    const g = parseGifMessage(content);
+    if (g.isGif) return '🎬 GIF';
+    return content;
+  };
+
   // Group reactions by emoji
   const reactionCounts = message.reactions.reduce((acc, curr) => {
     acc[curr.emoji] = (acc[curr.emoji] || 0) + 1;
@@ -57,7 +69,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
   return (
     <div
-      className={`group relative flex gap-3 my-3 px-2 sm:px-4 ${
+      className={`group relative flex gap-2.5 sm:gap-3 my-2.5 px-1 sm:px-4 ${
         isMe ? 'flex-row-reverse' : 'flex-row'
       }`}
     >
@@ -66,11 +78,11 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         name={message.sender?.display_name || (isMe ? 'Me' : 'Partner')}
         url={message.sender?.avatar_url}
         size="sm"
-        className="mt-1"
+        className="mt-1 shrink-0"
       />
 
       {/* Message Bubble Container */}
-      <div className={`max-w-[80%] sm:max-w-[70%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
         
         {/* Sender Name & Time */}
         <div className="flex items-center gap-2 mb-1 px-1">
@@ -80,7 +92,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           <span className="text-[10px] text-cream-400 dark:text-cream-500">
             {formatMessageTime(message.created_at)}
           </span>
-          {message.is_edited && (
+          {message.is_edited && !stickerInfo.isSticker && !gifInfo.isGif && (
             <span className="text-[10px] italic text-cream-400 dark:text-cream-500">
               (edited)
             </span>
@@ -97,11 +109,11 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             }`}
           >
             <span className="font-semibold">{message.reply_to.sender_name}: </span>
-            <span className="opacity-80 italic">{message.reply_to.content}</span>
+            <span className="opacity-80 italic">{getReplyPreviewText(message.reply_to.content)}</span>
           </div>
         )}
 
-        {/* Message Bubble */}
+        {/* Message Content Area */}
         <div className="relative">
           {isEditing ? (
             <div className="p-2 rounded-2xl bg-cream-50 dark:bg-cozydark-850 border border-blush-300 dark:border-blush-700 shadow-sm w-72 sm:w-80">
@@ -128,7 +140,38 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 </button>
               </div>
             </div>
+          ) : stickerInfo.isSticker ? (
+            /* Custom / Preset Sticker Rendering */
+            <div className="group/sticker relative inline-block p-1">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-transparent transition-transform hover:scale-105 active:scale-95 duration-200 flex items-center justify-center filter drop-shadow-md">
+                <img
+                  src={stickerInfo.imageUrl}
+                  alt={stickerInfo.name || 'Sticker'}
+                  className="w-full h-full object-contain rounded-2xl"
+                  loading="lazy"
+                />
+              </div>
+              {stickerInfo.name && (
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-cream-900/80 dark:bg-black/80 text-[10px] text-white font-medium opacity-0 group-hover/sticker:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xs">
+                  {stickerInfo.name}
+                </div>
+              )}
+            </div>
+          ) : gifInfo.isGif ? (
+            /* Animated GIF Rendering */
+            <div className="relative rounded-2xl overflow-hidden shadow-cozy border border-cream-200/80 dark:border-cozydark-800 bg-cream-100/50 dark:bg-cozydark-850 max-w-[240px] sm:max-w-[320px]">
+              <img
+                src={gifInfo.url}
+                alt="GIF"
+                className="w-full h-auto max-h-64 object-cover rounded-2xl"
+                loading="lazy"
+              />
+              <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-black/60 text-[9px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
+                GIF
+              </span>
+            </div>
           ) : (
+            /* Standard Text Message Bubble */
             <div
               className={`px-4 py-2.5 rounded-2.5xl text-sm leading-relaxed shadow-sm break-words select-text ${
                 isMe
@@ -140,7 +183,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             </div>
           )}
 
-          {/* Floating Hover Action Bar */}
+          {/* Floating Action Bar */}
           {!isEditing && (
             <div
               className={`absolute top-0 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cream-50 dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 shadow-cozy ${
@@ -165,19 +208,21 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 <Reply className="w-3.5 h-3.5" />
               </button>
 
-              {/* Edit & Delete for author */}
+              {/* Edit (only text) & Delete for author */}
               {isMe && (
                 <>
-                  <button
-                    onClick={() => {
-                      setEditContent(message.content);
-                      setIsEditing(true);
-                    }}
-                    className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
-                    title="Edit message"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
+                  {!stickerInfo.isSticker && !gifInfo.isGif && (
+                    <button
+                      onClick={() => {
+                        setEditContent(message.content);
+                        setIsEditing(true);
+                      }}
+                      className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
+                      title="Edit message"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                   <button
                     onClick={() => onDelete(message.id)}
                     className="p-1 rounded-full text-cream-500 hover:text-rose-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
@@ -190,7 +235,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             </div>
           )}
 
-          {/* Quick Floating Emoji Picker Popover */}
+          {/* Quick Floating Emoji Popover */}
           {showEmojiPicker && (
             <div
               className={`absolute bottom-full mb-2 z-20 flex gap-1 p-1.5 rounded-full bg-cream-50 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 shadow-cozy-lg ${
@@ -213,7 +258,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           )}
         </div>
 
-        {/* Rendered Reaction Pills */}
+        {/* Reaction Badges */}
         {Object.keys(reactionCounts).length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1.5 px-1">
             {Object.entries(reactionCounts).map(([emoji, count]) => {
