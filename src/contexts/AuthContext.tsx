@@ -24,6 +24,7 @@ interface AuthContextType {
   isLoading: boolean;
   isSchemaReady: boolean;
   schemaError: string | null;
+  isPartnerOnline: boolean;
   checkSchema: () => Promise<boolean>;
   signInWithPasscode: (passcode: string) => Promise<{ error: Error | null; user?: AuthUser }>;
   signIn: (passcode: string) => Promise<{ error: Error | null }>;
@@ -60,6 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSchemaReady, setIsSchemaReady] = useState<boolean>(true);
   const [schemaError, setSchemaError] = useState<string | null>(null);
+  const [isPartnerOnline, setIsPartnerOnline] = useState<boolean>(false);
 
   const checkSchema = useCallback(async () => {
     if (!isSupabaseConfigured()) {
@@ -201,6 +203,92 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     init();
   }, [checkSchema, loadUserDataForRole]);
 
+  // Realtime Presence tracking for partner
+  useEffect(() => {
+    if (!user || !isApproved || !isSupabaseConfigured()) {
+      setIsPartnerOnline(false);
+      return;
+    }
+
+    const partnerId =
+      partnerProfile?.id || (user.role === 'member_1' ? BASE_USER_SANA.id : BASE_USER_AZAN.id);
+
+    const presenceChannel = supabase.channel('sana_azan_presence_room', {
+      config: {
+        presence: {
+          key: user.id,
+        },
+      },
+    });
+
+    const updatePresenceState = () => {
+      try {
+        const state = presenceChannel.presenceState();
+        let partnerActive = false;
+
+        for (const [key, presences] of Object.entries(state)) {
+          if (key === partnerId && Array.isArray(presences) && presences.length > 0) {
+            partnerActive = true;
+            break;
+          }
+          if (Array.isArray(presences)) {
+            for (const item of presences as any[]) {
+              if (item?.user_id === partnerId) {
+                partnerActive = true;
+                break;
+              }
+            }
+          }
+          if (partnerActive) break;
+        }
+
+        setIsPartnerOnline(partnerActive);
+      } catch (e) {
+        console.warn('Presence status evaluation warning:', e);
+      }
+    };
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        updatePresenceState();
+      })
+      .on('presence', { event: 'join' }, () => {
+        updatePresenceState();
+      })
+      .on('presence', { event: 'leave' }, () => {
+        updatePresenceState();
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            user_id: user.id,
+            display_name: user.display_name,
+            online_at: new Date().toISOString(),
+          });
+          updatePresenceState();
+        }
+      });
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        presenceChannel.track({
+          user_id: user.id,
+          display_name: user.display_name,
+          online_at: new Date().toISOString(),
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      presenceChannel.untrack().catch(() => {});
+      supabase.removeChannel(presenceChannel);
+      setIsPartnerOnline(false);
+    };
+  }, [user?.id, user?.display_name, partnerProfile?.id, isApproved]);
+
   // Sign in with secret passcode
   const signInWithPasscode = async (passcode: string): Promise<{ error: Error | null; user?: AuthUser }> => {
     const trimmed = passcode.trim();
@@ -240,6 +328,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPartnerProfile(null);
     setAuthorizedMember(null);
     setIsApproved(false);
+    setIsPartnerOnline(false);
   };
 
   const updateProfile = async (updates: Partial<UserProfile>): Promise<{ error: Error | null }> => {
@@ -324,6 +413,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         isSchemaReady,
         schemaError,
+        isPartnerOnline,
         checkSchema,
         signInWithPasscode,
         signIn,

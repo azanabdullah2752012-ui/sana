@@ -1,9 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const DEFAULT_SUPABASE_URL = 'https://vxsushxqhqpjwayadqyj.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_ZfNh-NKE8udiIfKn0NBJ1g_oFcOSzIN';
 
-// Check if credentials are properly configured (not empty and not default placeholders)
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL).trim();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY).trim();
+
+// Check if credentials are properly configured
 export const isSupabaseConfigured = (): boolean => {
   if (!supabaseUrl || !supabaseAnonKey) return false;
   if (supabaseUrl.includes('your-project') || supabaseAnonKey.includes('your-anon-key')) return false;
@@ -15,16 +18,16 @@ export const isSupabaseConfigured = (): boolean => {
   }
 };
 
-// Fallback client
+// Supabase client instance with realtime enabled
 export const supabase = createClient(
-  isSupabaseConfigured() ? supabaseUrl : 'https://dummy-placeholder.supabase.co',
-  isSupabaseConfigured() ? supabaseAnonKey : 'dummy-key',
+  isSupabaseConfigured() ? supabaseUrl : DEFAULT_SUPABASE_URL,
+  isSupabaseConfigured() ? supabaseAnonKey : DEFAULT_SUPABASE_ANON_KEY,
   {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storage: window.localStorage,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     },
     realtime: {
       params: {

@@ -62,8 +62,8 @@ export const Avatar: React.FC<AvatarProps> = ({
         <span
           className={`absolute bottom-0 right-0 rounded-full border-2 border-cream-100 dark:border-cozydark-950 ${
             statusSizeClasses[size]
-          } ${isOnline ? 'bg-emerald-400' : 'bg-cream-400'}`}
-          title={isOnline ? 'Connected' : 'Offline'}
+          } ${isOnline ? 'bg-emerald-400' : 'bg-cream-400 dark:bg-cozydark-600'}`}
+          title={isOnline ? 'Connected & Online' : 'Offline'}
         />
       )}
     </div>

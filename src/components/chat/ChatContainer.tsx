@@ -7,7 +7,7 @@ import { Avatar } from '../common/Avatar';
 import { Heart, Sparkles, MessageSquare, Coffee, Lock } from 'lucide-react';
 
 export const ChatContainer: React.FC = () => {
-  const { user, profile, partnerProfile } = useAuth();
+  const { user, profile, partnerProfile, isPartnerOnline } = useAuth();
   const {
     messages,
     loading,
@@ -36,7 +36,7 @@ export const ChatContainer: React.FC = () => {
             url={partnerProfile?.avatar_url}
             size="md"
             showStatus={true}
-            isOnline={true}
+            isOnline={isPartnerOnline}
           />
           <div>
             <div className="flex items-center gap-2">
@@ -45,10 +45,17 @@ export const ChatContainer: React.FC = () => {
               </h2>
               <Heart className="w-3.5 h-3.5 fill-blush-400 text-blush-400" />
             </div>
-            <p className="text-xs text-cream-500 dark:text-cream-400 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Realtime Connected • End-to-End Private</span>
-            </p>
+            {isPartnerOnline ? (
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Active now 🌸 • End-to-End Private</span>
+              </p>
+            ) : (
+              <p className="text-xs text-cream-500 dark:text-cream-400 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cream-400 dark:bg-cozydark-600" />
+                <span>Offline • End-to-End Private</span>
+              </p>
+            )}
           </div>
         </div>
 

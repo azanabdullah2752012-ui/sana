@@ -29,7 +29,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   setActiveTab,
   onSendToChat,
 }) => {
-  const { profile, partnerProfile } = useAuth();
+  const { profile, partnerProfile, isPartnerOnline } = useAuth();
   const { memories } = useMemories();
   const { notes } = useNotes();
   const { dates, getDaysUntil } = useSpecialDates();
@@ -123,7 +123,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   url={partnerProfile.avatar_url}
                   size="lg"
                   showStatus={true}
-                  isOnline={true}
+                  isOnline={isPartnerOnline}
                 />
                 <div>
                   <h3 className="font-serif font-semibold text-base text-cream-900 dark:text-cream-50 flex items-center gap-1.5">
@@ -137,10 +137,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               </div>
 
               <div className="pt-3 border-t border-cream-200/60 dark:border-cozydark-800 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Online &amp; Active
-                </span>
+                {isPartnerOnline ? (
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Online &amp; Active
+                  </span>
+                ) : (
+                  <span className="text-[11px] text-cream-500 dark:text-cream-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cream-400 dark:bg-cozydark-600" />
+                    Offline
+                  </span>
+                )}
 
                 <button
                   onClick={() => setActiveTab('chat')}

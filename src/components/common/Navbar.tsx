@@ -27,7 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   onOpenSettings,
 }) => {
-  const { profile, partnerProfile } = useAuth();
+  const { profile, partnerProfile, isPartnerOnline } = useAuth();
   const { theme, setThemePreference } = useTheme();
 
   const toggleTheme = () => {
@@ -96,17 +96,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div
                 onClick={() => setActiveTab('chat')}
                 className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-cream-100/90 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 text-xs cursor-pointer hover:border-blush-300 dark:hover:border-blush-700 transition-colors"
-                title={`Chat with ${partnerProfile.display_name}`}
+                title={`Chat with ${partnerProfile.display_name} (${isPartnerOnline ? 'Online' : 'Offline'})`}
               >
                 <Avatar
                   name={partnerProfile.display_name}
                   url={partnerProfile.avatar_url}
                   size="xs"
                   showStatus={true}
-                  isOnline={true}
+                  isOnline={isPartnerOnline}
                 />
-                <span className="text-cream-700 dark:text-cream-300 font-medium text-xs">
+                <span className="text-cream-700 dark:text-cream-300 font-medium text-xs flex items-center gap-1.5">
                   {partnerProfile.display_name}
+                  <span
+                    className={`inline-block w-1.5 h-1.5 rounded-full ${
+                      isPartnerOnline ? 'bg-emerald-400 animate-pulse' : 'bg-cream-400 dark:bg-cozydark-600'
+                    }`}
+                  />
                 </span>
               </div>
             )}
