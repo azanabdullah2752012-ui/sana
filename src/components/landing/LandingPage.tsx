@@ -97,7 +97,7 @@ export const LandingPage: React.FC = () => {
               Sana &amp; Me
             </h1>
             <p className="text-[10px] sm:text-[11px] text-cream-500 dark:text-cream-400 font-medium">
-              Our Private Space
+              Best Friends Sanctuary
             </p>
           </div>
         </div>
@@ -130,8 +130,8 @@ export const LandingPage: React.FC = () => {
 
         {/* Soft Pill Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blush-100/70 dark:bg-blush-950/60 border border-blush-200/80 dark:border-blush-800/80 text-blush-700 dark:text-blush-300 text-xs font-medium mb-5 sm:mb-6 animate-fade-in shadow-sm">
-          <Heart className="w-3.5 h-3.5 fill-blush-400 text-blush-400 animate-pulse-subtle" />
-          <span>Made for Sana and Azan</span>
+          <Sparkles className="w-3.5 h-3.5 text-blush-400 animate-pulse-subtle" />
+          <span>Best Friends Sanctuary • Sana &amp; Azan</span>
         </div>
 
         {/* Main Headline */}
@@ -141,7 +141,7 @@ export const LandingPage: React.FC = () => {
 
         {/* Subtitle */}
         <p className="text-sm sm:text-base text-cream-600 dark:text-cream-300 max-w-xl font-light leading-relaxed mb-8 sm:mb-10 px-2">
-          A soft, peaceful sanctuary designed just for the two of us. Free of noise, distractions, or algorithms.
+          A soft, peaceful sanctuary designed just for two best friends. Free of noise, distractions, or algorithms.
         </p>
 
         {/* Inline Mobile-Friendly Secret Passcode Entrance */}
@@ -217,7 +217,7 @@ export const LandingPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 w-full text-center text-[11px] text-cream-500 dark:text-cream-400 border-t border-cream-200/60 dark:border-cozydark-850/60">
-        <p>Built for Sana &amp; Azan • Powered by React, Vite, Tailwind CSS &amp; Supabase</p>
+        <p>Built for besties Sana &amp; Azan • Powered by React, Vite, Tailwind CSS &amp; Supabase</p>
       </footer>
     </div>
   );

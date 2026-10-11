@@ -51,7 +51,7 @@ function setCachedProfile(userId: string, prof: UserProfile) {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { setThemePreference, setAccentColor } = useTheme();
+  const { setThemePreference } = useTheme();
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -101,13 +101,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsApproved(true);
 
     const savedLocalTheme = (localStorage.getItem('sana_theme_pref') as ThemePreference) || initialProfile.theme_preference;
-    const savedLocalAccent = (localStorage.getItem('sana_accent_color') as AccentColor) || initialProfile.accent_color;
 
     if (savedLocalTheme) {
       setThemePreference(savedLocalTheme);
-    }
-    if (savedLocalAccent) {
-      setAccentColor(savedLocalAccent);
     }
 
     // 2. Fetch latest live profile from Supabase and synchronize
@@ -153,9 +149,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (activeLocalTheme) {
             setThemePreference(activeLocalTheme);
           }
-          if (activeLocalAccent) {
-            setAccentColor(activeLocalAccent);
-          }
         }
 
         // Fetch partner profile from Supabase
@@ -179,7 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Profile fetch warning:', e);
       }
     }
-  }, [setThemePreference, setAccentColor]);
+  }, [setThemePreference]);
 
   // Initialize session from localStorage or verify Supabase
   useEffect(() => {
@@ -342,12 +335,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (updates: Partial<UserProfile>): Promise<{ error: Error | null }> => {
     if (!profile) return { error: new Error('No active profile') };
 
-    // 1. Immediately apply theme and accent to ThemeContext & DOM & localStorage
+    // 1. Immediately apply theme preference to ThemeContext & DOM & localStorage
     if (updates.theme_preference) {
       setThemePreference(updates.theme_preference);
-    }
-    if (updates.accent_color) {
-      setAccentColor(updates.accent_color);
     }
 
     const updated = {

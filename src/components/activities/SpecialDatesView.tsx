@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useSpecialDates } from '../../hooks/useSpecialDates';
 import { SpecialDateCategory } from '../../types/database';
-import { Calendar, Plus, Trash2, Heart, Gift, Compass } from 'lucide-react';
+import { Calendar, Plus, Trash2, Sparkles, Gift, Compass } from 'lucide-react';
 import { useToast } from '../common/Toast';
 
 const CATEGORIES: { id: SpecialDateCategory; label: string; icon: any }[] = [
   { id: 'birthday', label: 'Birthday', icon: Gift },
-  { id: 'anniversary', label: 'Anniversary', icon: Heart },
+  { id: 'anniversary', label: 'Friendship Milestone', icon: Sparkles },
   { id: 'trip', label: 'Trip / Getaway', icon: Compass },
   { id: 'milestone', label: 'Milestone', icon: Calendar },
   { id: 'reminder', label: 'Reminder', icon: Calendar },
@@ -53,7 +53,7 @@ export const SpecialDatesView: React.FC = () => {
               Important Dates &amp; Countdowns
             </h3>
             <p className="text-xs text-cream-500 dark:text-cream-400 font-light">
-              Never forget birthdays, anniversaries, and planned getaways.
+              Never forget birthdays, friendship milestones, and planned getaways.
             </p>
           </div>
         </div>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme, WALLPAPER_PRESETS, WallpaperId } from '../../contexts/ThemeContext';
 import { Modal } from '../common/Modal';
 import { Avatar } from '../common/Avatar';
 import { useToast } from '../common/Toast';
 import { uploadMemoryImage, optimizeAvatarImage } from '../../lib/storage';
-import { ThemePreference, AccentColor } from '../../types/database';
+import { ThemePreference } from '../../types/database';
 import { getKlipyApiKey, setKlipyApiKey } from '../../lib/gifs';
 import {
   User,
@@ -21,6 +21,8 @@ import {
   Sun,
   Moon,
   Monitor,
+  Trash2,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -28,80 +30,20 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-interface SanctuaryTheme {
-  id: AccentColor;
-  name: string;
-  subtitle: string;
-  emoji: string;
-  accentBg: string;
-}
-
-const SANCTUARY_THEMES: SanctuaryTheme[] = [
-  {
-    id: 'blush',
-    name: 'Blush Romance',
-    subtitle: 'Soft Rose & Candlelight',
-    emoji: '🌸',
-    accentBg: 'bg-[#F472B6]',
-  },
-  {
-    id: 'violet',
-    name: 'Midnight Velvet',
-    subtitle: 'Amethyst & Starry Obsidian',
-    emoji: '🌙',
-    accentBg: 'bg-[#8B5CF6]',
-  },
-  {
-    id: 'mint',
-    name: 'Matcha & Sage',
-    subtitle: 'Eucalyptus & Organic Moss',
-    emoji: '🌿',
-    accentBg: 'bg-[#10B981]',
-  },
-  {
-    id: 'peach',
-    name: 'Sunset Amber',
-    subtitle: 'Terracotta & Golden Honey',
-    emoji: '🍯',
-    accentBg: 'bg-[#FB923C]',
-  },
-  {
-    id: 'rose',
-    name: 'Bordeaux Wine',
-    subtitle: 'Deep Crimson & Ruby Velvet',
-    emoji: '🍷',
-    accentBg: 'bg-[#F43F5E]',
-  },
-  {
-    id: 'sky',
-    name: 'Nordic Sky',
-    subtitle: 'Arctic Cyan & Frosted Slate',
-    emoji: '❄️',
-    accentBg: 'bg-[#0EA5E9]',
-  },
-  {
-    id: 'cream',
-    name: 'Cozy Mocha',
-    subtitle: 'Warm Cashmere & Roasted Cocoa',
-    emoji: '☕',
-    accentBg: 'bg-[#B88E6D]',
-  },
-  {
-    id: 'lavender',
-    name: 'Lavender Dusk',
-    subtitle: 'Dreamy Lilac & Twilight Mist',
-    emoji: '🔮',
-    accentBg: 'bg-[#BA9BF0]',
-  },
-];
-
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const {
     profile,
     updateProfile,
     signOut,
   } = useAuth();
-  const { themePreference, setThemePreference, accentColor, setAccentColor } = useTheme();
+  const {
+    themePreference,
+    setThemePreference,
+    wallpaper,
+    setWallpaper,
+    customWallpaperUrl,
+    setCustomWallpaperUrl,
+  } = useTheme();
   const { showToast } = useToast();
 
   const [displayName, setDisplayName] = useState('');
@@ -157,11 +99,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     updateProfile({ theme_preference: mode }).catch(() => {});
   };
 
-  const handleSelectTheme = (themeId: AccentColor) => {
-    setAccentColor(themeId);
-    updateProfile({ accent_color: themeId }).catch(() => {});
-    const themeObj = SANCTUARY_THEMES.find((t) => t.id === themeId);
-    showToast(`Switched to ${themeObj?.name || themeId} ✨`, 'info');
+  const handleSelectWallpaper = (id: WallpaperId) => {
+    setWallpaper(id);
+    const item = WALLPAPER_PRESETS.find((p) => p.id === id);
+    showToast(`Atmosphere set to ${item?.name || id} ✨`, 'info');
+  };
+
+  const handleCustomWallpaperUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      showToast('Image size must be under 20MB', 'error');
+      return;
+    }
+
+    try {
+      showToast('Setting custom bestie wallpaper...', 'info');
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        if (result) {
+          setCustomWallpaperUrl(result);
+          setWallpaper('custom');
+          showToast('Our Bestie Photo set as wallpaper! 📸✨', 'success');
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to set wallpaper', 'error');
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveCustomWallpaper = () => {
+    setCustomWallpaperUrl(null);
+    setWallpaper('minimal');
+    showToast('Custom wallpaper removed. Back to Clean Minimal ✨', 'info');
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -178,7 +153,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         bio: bio.trim(),
         avatar_url: avatarUrl,
         theme_preference: themePreference,
-        accent_color: accentColor,
       });
 
       setKlipyApiKey(klipyApiKeyInput.trim());
@@ -302,12 +276,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* 2. Theme & Sanctuary Color Atmospheres */}
+        {/* 2. Theme & Sanctuary Wallpaper Atmosphere */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 flex items-center gap-1.5">
               <Palette className="w-4 h-4 text-blush-400" />
-              <span>Theme &amp; Appearance</span>
+              <span>Sanctuary Atmosphere &amp; Wallpaper</span>
             </h4>
             <span className="text-[11px] text-cream-500 dark:text-cream-400 font-normal">
               Instant live preview ✨
@@ -346,50 +320,102 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
           </div>
 
-          {/* Sanctuary Themes */}
+          {/* Wallpaper Selection */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-medium text-cream-700 dark:text-cream-300">
-                Sanctuary Atmosphere:
+                Atmosphere Background:
               </label>
               <span className="text-[11px] font-medium text-blush-500 dark:text-blush-400">
-                {SANCTUARY_THEMES.find((t) => t.id === accentColor)?.name}
+                {WALLPAPER_PRESETS.find((p) => p.id === wallpaper)?.name || 'Custom Photo'}
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {SANCTUARY_THEMES.map((t) => {
-                const isSelected = accentColor === t.id;
+              {WALLPAPER_PRESETS.map((preset) => {
+                const isSelected = wallpaper === preset.id;
+                const isCustom = preset.id === 'custom';
+
                 return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => handleSelectTheme(t.id)}
-                    className={`flex items-center gap-3 p-3 rounded-2xl text-left border transition-all ${
+                  <div
+                    key={preset.id}
+                    onClick={() => {
+                      if (!isCustom) {
+                        handleSelectWallpaper(preset.id);
+                      } else if (customWallpaperUrl) {
+                        handleSelectWallpaper('custom');
+                      }
+                    }}
+                    className={`relative flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-white dark:bg-cozydark-800 border-blush-500 dark:border-blush-400 ring-2 ring-blush-400/30 shadow-xs'
                         : 'bg-cream-100/70 dark:bg-cozydark-850/70 border-cream-200/90 dark:border-cozydark-750 hover:bg-cream-200/50 dark:hover:bg-cozydark-800/60'
                     }`}
                   >
-                    {/* Emoji Swatch Tile */}
-                    <div className="relative shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-cream-50 dark:bg-cozydark-900 border border-cream-200 dark:border-cozydark-700 shadow-2xs">
-                      <span className="text-base select-none">{t.emoji}</span>
-                      <span
-                        className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ${t.accentBg} ring-2 ring-white dark:ring-cozydark-850 shadow-xs`}
-                      />
+                    {/* Visual Thumbnail */}
+                    <div className="relative shrink-0 w-11 h-11 rounded-xl overflow-hidden border border-cream-300/80 dark:border-cozydark-700 shadow-2xs">
+                      {isCustom && customWallpaperUrl ? (
+                        <img
+                          src={customWallpaperUrl}
+                          alt="Custom Bestie Photo"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : preset.url ? (
+                        <img
+                          src={preset.url}
+                          alt={preset.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className={`w-full h-full bg-gradient-to-br ${preset.thumbGradient}`} />
+                      )}
+                      <span className="absolute inset-0 flex items-center justify-center text-sm bg-black/20 select-none">
+                        {preset.emoji}
+                      </span>
                     </div>
 
+                    {/* Information & Action */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-semibold text-cream-900 dark:text-cream-50 truncate">
-                          {t.name}
+                          {preset.name}
                         </span>
                       </div>
                       <p className="text-[10px] text-cream-500 dark:text-cream-400 truncate">
-                        {t.subtitle}
+                        {isCustom && customWallpaperUrl
+                          ? 'Custom photo active'
+                          : preset.subtitle}
                       </p>
+
+                      {isCustom && (
+                        <div className="flex items-center gap-2 mt-1" onClick={(e) => e.stopPropagation()}>
+                          <label className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-cream-200/70 dark:bg-cozydark-750 text-[10px] font-medium text-cream-700 dark:text-cream-200 hover:bg-cream-300/70 transition-colors cursor-pointer">
+                            <Upload className="w-2.5 h-2.5" />
+                            <span>{customWallpaperUrl ? 'Change' : 'Upload Photo'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleCustomWallpaperUpload}
+                              className="hidden"
+                            />
+                          </label>
+                          {customWallpaperUrl && (
+                            <button
+                              type="button"
+                              onClick={handleRemoveCustomWallpaper}
+                              className="text-[10px] text-rose-500 hover:text-rose-600 flex items-center gap-0.5"
+                              title="Remove custom wallpaper"
+                            >
+                              <Trash2 className="w-2.5 h-2.5" />
+                              <span>Remove</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
 
+                    {/* Selected Indicator */}
                     {isSelected ? (
                       <div className="shrink-0 w-5 h-5 rounded-full bg-blush-500 dark:bg-blush-400 flex items-center justify-center text-white">
                         <Check className="w-3 h-3 stroke-[3]" />
@@ -397,7 +423,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     ) : (
                       <div className="shrink-0 w-4 h-4 rounded-full border border-cream-300 dark:border-cozydark-700" />
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>

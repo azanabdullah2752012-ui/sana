@@ -32,7 +32,7 @@ export const ChatContainer: React.FC = () => {
       <div className="px-5 py-3.5 bg-cream-100/90 dark:bg-cozydark-850/90 border-b border-cream-200/80 dark:border-cozydark-750 flex items-center justify-between backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <Avatar
-            name={partnerProfile?.display_name || 'Friend'}
+            name={partnerProfile?.display_name || 'Bestie'}
             url={partnerProfile?.avatar_url}
             size="md"
             showStatus={true}
@@ -41,14 +41,14 @@ export const ChatContainer: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-serif font-semibold text-base text-cream-900 dark:text-cream-50">
-                {partnerProfile?.display_name || 'Partner'} &amp; {profile?.display_name || 'You'}
+                {partnerProfile?.display_name || 'Bestie'} &amp; {profile?.display_name || 'You'}
               </h2>
-              <Heart className="w-3.5 h-3.5 fill-blush-400 text-blush-400" />
+              <Sparkles className="w-3.5 h-3.5 text-blush-400" />
             </div>
             {isPartnerOnline ? (
               <p className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Active now 🌸 • End-to-End Private</span>
+                <span>Active now ✨ • End-to-End Private</span>
               </p>
             ) : (
               <p className="text-xs text-cream-500 dark:text-cream-400 flex items-center gap-1.5">

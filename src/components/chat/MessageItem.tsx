@@ -76,7 +76,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     >
       {/* Sender Avatar */}
       <Avatar
-        name={message.sender?.display_name || (isMe ? 'Me' : 'Partner')}
+        name={message.sender?.display_name || (isMe ? 'Me' : 'Bestie')}
         url={message.sender?.avatar_url}
         size="sm"
         className="mt-1 shrink-0"
@@ -88,7 +88,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         {/* Sender Name & Time */}
         <div className="flex items-center gap-2 mb-1 px-1">
           <span className="text-xs font-medium text-cream-600 dark:text-cream-400">
-            {message.sender?.display_name || (isMe ? 'Me' : 'Friend')}
+            {message.sender?.display_name || (isMe ? 'Me' : 'Bestie')}
           </span>
           <span className="text-[10px] text-cream-400 dark:text-cream-500">
             {formatMessageTime(message.created_at)}

@@ -65,7 +65,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream-100/90 dark:bg-cozydark-800 text-blush-600 dark:text-blush-300 text-xs font-medium mb-3 border border-blush-100 dark:border-cozydark-700 shadow-xs">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>A sanctuary just for the two of us</span>
+              <span>Sanctuary for two best friends</span>
             </div>
 
             <h1 className="font-serif text-3xl sm:text-4xl text-cream-900 dark:text-cream-50 font-semibold mb-2 tracking-tight">
@@ -79,10 +79,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <p className="text-xs sm:text-sm text-cream-600 dark:text-cream-300 font-light leading-relaxed">
               {partnerProfile ? (
                 <>
-                  Connected with <strong>{partnerProfile.display_name}</strong>. Everything you share here is private, synchronized in real time, and protected by PostgreSQL Row Level Security.
+                  Connected with your bestie <strong>{partnerProfile.display_name}</strong>. Everything you share here is private, synchronized in real time, and protected by PostgreSQL Row Level Security.
                 </>
               ) : (
-                'Welcome to your private space. Start a conversation or save a memory.'
+                'Welcome to your private best friends space. Start a conversation or save a memory.'
               )}
             </p>
 
@@ -98,7 +98,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
               <button
                 onClick={() => setActiveTab('memories')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-cream-100/90 dark:bg-cozydark-800 text-cream-800 dark:text-cream-200 border border-cream-200 dark:border-cozydark-700 hover:bg-cream-200/80 text-xs font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-cream-100/90 dark:bg-cozydark-850 text-cream-800 dark:text-cream-200 border border-cream-200 dark:border-cozydark-700 hover:bg-cream-200/80 text-xs font-medium transition-colors"
               >
                 <Camera className="w-3.5 h-3.5 text-blush-400" />
                 <span>Scrapbook</span>
@@ -106,7 +106,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
               <button
                 onClick={() => setQuestionModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-cream-100/90 dark:bg-cozydark-800 text-cream-800 dark:text-cream-200 border border-cream-200 dark:border-cozydark-700 hover:bg-cream-200/80 text-xs font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-cream-100/90 dark:bg-cozydark-850 text-cream-800 dark:text-cream-200 border border-cream-200 dark:border-cozydark-700 hover:bg-cream-200/80 text-xs font-medium transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5 text-lavender-400" />
                 <span>Daily Prompt</span>
@@ -128,10 +128,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <div>
                   <h3 className="font-serif font-semibold text-base text-cream-900 dark:text-cream-50 flex items-center gap-1.5">
                     {partnerProfile.display_name}
-                    <Heart className="w-3.5 h-3.5 fill-blush-400 text-blush-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-blush-400" />
                   </h3>
                   <p className="text-[11px] text-cream-500 dark:text-cream-400 leading-tight">
-                    {partnerProfile.bio || 'Sharing cozy moments together ✨'}
+                    {partnerProfile.bio || 'Best friends sharing cozy moments ✨'}
                   </p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <p className="text-xs text-cream-600 dark:text-cream-400 font-light">
               {myAnswer ? (
                 <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                  ✓ You answered today! {partnerAnswer ? `Both of you have shared your thoughts.` : `Waiting for ${partnerProfile?.display_name || 'Sana'}.`}
+                  ✓ You answered today! {partnerAnswer ? `Both of you have shared your thoughts.` : `Waiting for your bestie ${partnerProfile?.display_name || 'Sana'}.`}
                 </span>
               ) : (
                 'You haven\'t answered today\'s question yet! Take 30 seconds to reflect.'

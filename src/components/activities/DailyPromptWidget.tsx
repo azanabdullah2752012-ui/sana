@@ -150,12 +150,12 @@ export const DailyPromptWidget: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Avatar
-                name={partnerProfile?.display_name || 'Partner'}
+                name={partnerProfile?.display_name || 'Bestie'}
                 url={partnerProfile?.avatar_url}
                 size="xs"
               />
               <span className="text-xs font-semibold text-cream-800 dark:text-cream-200">
-                {partnerProfile?.display_name || 'Partner'}'s Answer
+                {partnerProfile?.display_name || 'Bestie'}'s Answer
               </span>
             </div>
 

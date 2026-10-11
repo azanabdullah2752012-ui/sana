@@ -11,6 +11,7 @@ import { MemoriesView } from './components/memories/MemoriesView';
 import { NotesView } from './components/notes/NotesView';
 import { ActivitiesView } from './components/activities/ActivitiesView';
 import { SettingsModal } from './components/settings/SettingsModal';
+import { WallpaperBackground } from './components/common/WallpaperBackground';
 import { Sparkles, Heart } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -47,7 +48,10 @@ const AppContent: React.FC = () => {
 
   // 4. Authenticated & Approved: Render Sanctuary
   return (
-    <div className="min-h-screen bg-cream-100 text-cream-900 dark:bg-cozydark-950 dark:text-cream-100 transition-colors flex flex-col pb-20 md:pb-6">
+    <div className="min-h-screen text-cream-900 dark:text-cream-100 transition-colors flex flex-col pb-20 md:pb-6 relative bg-cream-100/90 dark:bg-cozydark-950/90">
+      {/* Dynamic Atmospheric Wallpaper Backdrop */}
+      <WallpaperBackground />
+
       {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -56,7 +60,7 @@ const AppContent: React.FC = () => {
       />
 
       {/* Main View Area */}
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full relative z-10">
         {activeTab === 'dashboard' && (
           <DashboardOverview
             setActiveTab={setActiveTab}

@@ -61,10 +61,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="font-serif font-semibold text-base sm:text-lg text-cream-900 dark:text-cream-50 leading-tight flex items-center gap-1.5">
                 Sana &amp; Me
-                <Heart className="w-3 h-3 text-blush-400 fill-blush-400 inline-block animate-pulse-subtle" />
+                <Sparkles className="w-3 h-3 text-blush-400 inline-block animate-pulse-subtle" />
               </div>
               <p className="text-[9px] sm:text-[10px] tracking-wider uppercase text-cream-500 dark:text-cream-400 font-medium">
-                Our Private Space
+                Best Friends Sanctuary
               </p>
             </div>
           </button>
