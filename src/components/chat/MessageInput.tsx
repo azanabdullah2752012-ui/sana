@@ -176,7 +176,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             {/* Full Emoji Picker */}
             <button
               type="button"
-              onClick={() => setEmojiModalOpen(true)}
+              onClick={() => setEmojiModalOpen((prev) => !prev)}
               className="p-2 rounded-full text-cream-500 dark:text-cream-400 hover:text-blush-600 dark:hover:text-blush-300 hover:bg-cream-200/80 dark:hover:bg-cozydark-750 transition-all active:scale-95"
               title="All Emojis"
               aria-label="Open emoji picker"
@@ -275,13 +275,18 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </div>
       )}
 
-      {/* Full WhatsApp Emoji Picker Modal */}
-      <EmojiPickerModal
-        isOpen={emojiModalOpen}
-        onClose={() => setEmojiModalOpen(false)}
-        onSelectEmoji={(emoji) => addEmoji(emoji)}
-        title="Insert Emoji"
-      />
+      {/* Floating Anchored WhatsApp Emoji Picker Drawer */}
+      {emojiModalOpen && (
+        <div className="absolute bottom-full mb-2 left-2 sm:left-4 z-40 animate-slide-up shadow-2xl">
+          <EmojiPickerModal
+            isOpen={emojiModalOpen}
+            onClose={() => setEmojiModalOpen(false)}
+            onSelectEmoji={(emoji) => addEmoji(emoji)}
+            title="Insert Emoji"
+            isPopover={true}
+          />
+        </div>
+      )}
 
       {/* Screenshot / Photo Preview Modal */}
       <ScreenshotPreviewModal
