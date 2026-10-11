@@ -66,19 +66,19 @@ export const ChatContainer: React.FC = () => {
             <p className="text-xs font-serif">Opening our conversation nook...</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-cream-500 dark:text-cream-400">
-            <div className="w-16 h-16 rounded-3xl bg-blush-100 dark:bg-blush-950/60 border border-blush-200 dark:border-blush-800 flex items-center justify-center mb-4 text-blush-500 shadow-sm">
+          <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center p-6 text-cream-500 dark:text-cream-400 my-auto">
+            <div className="w-16 h-16 rounded-3xl bg-blush-500/15 dark:bg-blush-500/25 border border-blush-500/30 flex items-center justify-center mb-4 text-blush-500 shadow-sm">
               <Sparkles className="w-8 h-8" />
             </div>
             <h3 className="font-serif text-lg font-medium text-cream-900 dark:text-cream-100 mb-1">
               Quiet &amp; Peaceful Here
             </h3>
-            <p className="text-xs max-w-xs text-cream-600 dark:text-cream-400 mb-4">
+            <p className="text-xs max-w-xs text-cream-600 dark:text-cream-400 mb-4 font-light">
               Leave a gentle note, share a thought from today, or ask Sana how her coffee was!
             </p>
             <button
               onClick={() => sendMessage('Thinking of you! Hope you have a wonderful cozy day ☕🌸')}
-              className="px-4 py-2 rounded-2xl bg-blush-100 hover:bg-blush-200/80 text-blush-800 dark:bg-blush-950/70 dark:text-blush-200 dark:hover:bg-blush-900 border border-blush-200 dark:border-blush-800 text-xs font-medium transition-colors"
+              className="px-5 py-2.5 rounded-2xl bg-blush-500 hover:bg-blush-600 text-white text-xs font-medium shadow-cozy hover:shadow-cozy-lg transition-all transform active:scale-95"
             >
               "Thinking of you! Hope you have a wonderful day ☕🌸"
             </button>

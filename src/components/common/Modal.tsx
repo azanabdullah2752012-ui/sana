@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -16,17 +17,29 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   maxWidth = 'md',
 }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const maxWidthClasses = {
     sm: 'max-w-sm',
@@ -36,20 +49,20 @@ export const Modal: React.FC<ModalProps> = ({
     '2xl': 'max-w-2xl',
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+  const modalContent = (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
       {/* Soft Blurred Backdrop */}
       <div
-        className="fixed inset-0 bg-cream-900/40 dark:bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        className="fixed inset-0 bg-cream-950/60 dark:bg-black/75 backdrop-blur-md transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modal Dialog Card */}
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-cream-50 dark:bg-cozydark-900 rounded-3xl border border-cream-200 dark:border-cozydark-800 shadow-cozy-lg dark:shadow-cozy-dark-lg p-6 sm:p-7 overflow-hidden transition-all duration-300 animate-slide-up z-10`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} my-auto bg-cream-50 dark:bg-cozydark-900 rounded-3xl border border-cream-200 dark:border-cozydark-800 shadow-cozy-lg dark:shadow-cozy-dark-lg p-5 sm:p-7 overflow-hidden transition-all duration-300 animate-slide-up z-10`}
       >
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-cream-200/80 dark:border-cozydark-800/80">
-          {title && <div className="text-xl font-serif font-medium text-cream-900 dark:text-cream-100">{title}</div>}
+        <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-cream-200/80 dark:border-cozydark-800/80">
+          {title && <div className="text-lg sm:text-xl font-serif font-medium text-cream-900 dark:text-cream-50">{title}</div>}
           <button
             onClick={onClose}
             className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-cream-400 hover:text-cream-700 hover:bg-cream-100 dark:hover:text-cream-200 dark:hover:bg-cozydark-800 transition-colors ml-auto -mr-2"
@@ -59,10 +72,12 @@ export const Modal: React.FC<ModalProps> = ({
           </button>
         </div>
 
-        <div className="max-h-[80dvh] overflow-y-auto pr-1">
+        <div className="max-h-[75vh] max-h-[75dvh] overflow-y-auto pr-1">
           {children}
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };

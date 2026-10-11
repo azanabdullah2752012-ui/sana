@@ -33,128 +33,128 @@
 }
 
 /* ==============================================================================
-   DYNAMIC ACCENT PALETTES (THEMES)
+   DYNAMIC ACCENT PALETTES (RGB Format for 100% Tailwind Alpha & Dark Support)
    ============================================================================== */
 
 /* 1. Blush Pink (Default) */
 :root,
 [data-accent="blush"] {
-  --accent-50: #FFF7F8;
-  --accent-100: #FFEBF0;
-  --accent-200: #FED7E2;
-  --accent-300: #FBB7CD;
-  --accent-400: #F68CAE;
-  --accent-500: #E8638F;
-  --accent-600: #CC4373;
-  --accent-700: #A62F59;
-  --accent-800: #7B2141;
-  --accent-900: #52142A;
-  --accent-950: #3B0A1C;
+  --accent-50: 255 247 248;
+  --accent-100: 255 235 240;
+  --accent-200: 254 215 226;
+  --accent-300: 251 183 205;
+  --accent-400: 246 140 174;
+  --accent-500: 232 99 143;
+  --accent-600: 204 67 115;
+  --accent-700: 166 47 89;
+  --accent-800: 123 33 65;
+  --accent-900: 82 20 42;
+  --accent-950: 59 10 28;
 }
 
 /* 2. Pastel Lavender */
 [data-accent="lavender"] {
-  --accent-50: #FAF8FF;
-  --accent-100: #F3EDFD;
-  --accent-200: #E7DCFA;
-  --accent-300: #D5C2F6;
-  --accent-400: #BA9BF0;
-  --accent-500: #9E72E7;
-  --accent-600: #824FD6;
-  --accent-700: #6937B8;
-  --accent-800: #502891;
-  --accent-900: #381A6B;
-  --accent-950: #230B48;
+  --accent-50: 250 248 255;
+  --accent-100: 243 237 253;
+  --accent-200: 231 220 250;
+  --accent-300: 213 194 246;
+  --accent-400: 186 155 240;
+  --accent-500: 158 114 231;
+  --accent-600: 130 79 214;
+  --accent-700: 105 55 184;
+  --accent-800: 80 40 145;
+  --accent-900: 56 26 107;
+  --accent-950: 35 11 72;
 }
 
 /* 3. Dusty Rose */
 [data-accent="rose"] {
-  --accent-50: #FFF1F2;
-  --accent-100: #FFE4E6;
-  --accent-200: #FECDD3;
-  --accent-300: #FDA4AF;
-  --accent-400: #FB7185;
-  --accent-500: #F43F5E;
-  --accent-600: #E11D48;
-  --accent-700: #BE123C;
-  --accent-800: #9F1239;
-  --accent-900: #881337;
-  --accent-950: #4C0519;
+  --accent-50: 255 241 242;
+  --accent-100: 255 228 230;
+  --accent-200: 254 205 211;
+  --accent-300: 253 164 175;
+  --accent-400: 251 113 133;
+  --accent-500: 244 63 94;
+  --accent-600: 225 29 72;
+  --accent-700: 190 18 60;
+  --accent-800: 159 18 57;
+  --accent-900: 136 19 55;
+  --accent-950: 76 5 25;
 }
 
 /* 4. Warm Peach */
 [data-accent="peach"] {
-  --accent-50: #FFF7ED;
-  --accent-100: #FFEDD5;
-  --accent-200: #FED7AA;
-  --accent-300: #FDBA74;
-  --accent-400: #FB923C;
-  --accent-500: #F97316;
-  --accent-600: #EA580C;
-  --accent-700: #C2410C;
-  --accent-800: #9A3412;
-  --accent-900: #7C2D12;
-  --accent-950: #431407;
+  --accent-50: 255 247 237;
+  --accent-100: 255 237 213;
+  --accent-200: 254 215 170;
+  --accent-300: 253 186 116;
+  --accent-400: 251 146 60;
+  --accent-500: 249 115 22;
+  --accent-600: 234 88 12;
+  --accent-700: 194 65 12;
+  --accent-800: 154 52 18;
+  --accent-900: 124 45 18;
+  --accent-950: 67 20 7;
 }
 
 /* 5. Sage Mint */
 [data-accent="mint"] {
-  --accent-50: #F0FDF4;
-  --accent-100: #DCFCE7;
-  --accent-200: #BBF7D0;
-  --accent-300: #86EFAC;
-  --accent-400: #4ADE80;
-  --accent-500: #22C55E;
-  --accent-600: #16A34A;
-  --accent-700: #15803D;
-  --accent-800: #166534;
-  --accent-900: #14532D;
-  --accent-950: #052E16;
+  --accent-50: 240 253 244;
+  --accent-100: 220 252 231;
+  --accent-200: 187 247 208;
+  --accent-300: 134 239 172;
+  --accent-400: 74 222 128;
+  --accent-500: 34 197 94;
+  --accent-600: 22 163 74;
+  --accent-700: 21 128 61;
+  --accent-800: 22 101 52;
+  --accent-900: 20 83 45;
+  --accent-950: 5 46 22;
 }
 
 /* 6. Soft Sky */
 [data-accent="sky"] {
-  --accent-50: #F0F9FF;
-  --accent-100: #E0F2FE;
-  --accent-200: #BAE6FD;
-  --accent-300: #7DD3FC;
-  --accent-400: #38BDF8;
-  --accent-500: #0EA5E9;
-  --accent-600: #0284C7;
-  --accent-700: #0369A1;
-  --accent-800: #075985;
-  --accent-900: #0C4A6E;
-  --accent-950: #082F49;
+  --accent-50: 240 249 255;
+  --accent-100: 224 242 254;
+  --accent-200: 186 230 253;
+  --accent-300: 125 211 252;
+  --accent-400: 56 189 248;
+  --accent-500: 14 165 233;
+  --accent-600: 2 132 199;
+  --accent-700: 3 105 161;
+  --accent-800: 7 89 133;
+  --accent-900: 12 74 110;
+  --accent-950: 8 47 73;
 }
 
 /* 7. Royal Violet */
 [data-accent="violet"] {
-  --accent-50: #F5F3FF;
-  --accent-100: #EDE9FE;
-  --accent-200: #DDD6FE;
-  --accent-300: #C4B5FD;
-  --accent-400: #A78BFA;
-  --accent-500: #8B5CF6;
-  --accent-600: #7C3AED;
-  --accent-700: #6D28D9;
-  --accent-800: #5B21B6;
-  --accent-900: #4C1D95;
-  --accent-950: #2E1065;
+  --accent-50: 245 243 255;
+  --accent-100: 237 233 254;
+  --accent-200: 221 214 254;
+  --accent-300: 196 181 253;
+  --accent-400: 167 139 250;
+  --accent-500: 139 92 246;
+  --accent-600: 124 58 237;
+  --accent-700: 109 40 217;
+  --accent-800: 91 33 182;
+  --accent-900: 76 29 149;
+  --accent-950: 46 16 101;
 }
 
 /* 8. Toasted Cream */
 [data-accent="cream"] {
-  --accent-50: #FDFCF7;
-  --accent-100: #FAF6ED;
-  --accent-200: #F4ECE0;
-  --accent-300: #EADBCB;
-  --accent-400: #DCC3AD;
-  --accent-500: #B88E6D;
-  --accent-600: #9E7455;
-  --accent-700: #80593E;
-  --accent-800: #63422C;
-  --accent-900: #472C1C;
-  --accent-950: #2E1A0F;
+  --accent-50: 253 252 247;
+  --accent-100: 250 246 237;
+  --accent-200: 244 236 224;
+  --accent-300: 234 219 203;
+  --accent-400: 220 195 173;
+  --accent-500: 184 142 109;
+  --accent-600: 158 116 85;
+  --accent-700: 128 89 62;
+  --accent-800: 99 66 44;
+  --accent-900: 71 44 28;
+  --accent-950: 46 26 15;
 }
 
 /* Custom Cozy Scrollbars */
@@ -173,7 +173,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-400);
+  background: rgb(var(--accent-400));
 }
 
 .dark ::-webkit-scrollbar-thumb {
@@ -181,7 +181,7 @@
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-400);
+  background: rgb(var(--accent-400));
 }
 
 /* Hide scrollbar for clean tab carousels */
