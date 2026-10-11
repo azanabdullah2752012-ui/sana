@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Message } from '../../types/database';
 import { Avatar } from '../common/Avatar';
-import { Reply, Edit2, Trash2, Smile, Check, X, Maximize2, Download, Image as ImageIcon } from 'lucide-react';
+import { Reply, Edit2, Trash2, Smile, Check, X, Maximize2, Download, MoreVertical, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseStickerMessage } from '../../lib/stickers';
 import { parseGifMessage } from '../../lib/gifs';
@@ -9,6 +9,7 @@ import { parseImageMessage } from '../../lib/images';
 import { parseAudioMessage } from '../../lib/audio';
 import { AudioMessageBubble } from './AudioMessageBubble';
 import { EmojiPickerModal } from './EmojiPickerModal';
+import { MessageContextMenu } from './MessageContextMenu';
 
 interface MessageItemProps {
   message: Message;
@@ -18,6 +19,7 @@ interface MessageItemProps {
   onDelete: (messageId: string) => void;
   onToggleReaction: (messageId: string, emoji: string) => void;
   currentUserId: string;
+  isPartnerOnline?: boolean;
 }
 
 const COMMON_EMOJIS = ['🌸', '💖', '☕', '🍰', '✨', '🥺', '🫂', '😂', '🥰', '🔥'];
@@ -30,6 +32,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   onDelete,
   onToggleReaction,
   currentUserId,
+  isPartnerOnline = false,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [fullEmojiModalOpen, setFullEmojiModalOpen] = useState(false);
@@ -37,6 +40,13 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   const [editContent, setEditContent] = useState(message.content);
   const [gifLightboxOpen, setGifLightboxOpen] = useState(false);
   const [imageLightboxOpen, setImageLightboxOpen] = useState(false);
+
+  // WhatsApp-style Right Click Context Menu State
+  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
+    isOpen: false,
+    x: 0,
+    y: 0,
+  });
 
   const stickerInfo = parseStickerMessage(message.content);
   const gifInfo = parseGifMessage(message.content);
@@ -56,6 +66,27 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       onEdit(message.id, editContent.trim());
       setIsEditing(false);
     }
+  };
+
+  const handleCopy = () => {
+    try {
+      if (imageInfo.isImage) {
+        navigator.clipboard.writeText(imageInfo.imageUrl || message.content);
+      } else {
+        navigator.clipboard.writeText(message.content);
+      }
+    } catch {
+      // Fallback
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setContextMenu({
+      isOpen: true,
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
 
   const getReplyPreviewText = (content: string) => {
@@ -81,9 +112,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     safeReactions.filter((r) => r.user_id === currentUserId).map((r) => r.emoji)
   );
 
+  const isTextOnly = !stickerInfo.isSticker && !gifInfo.isGif && !imageInfo.isImage && !audioInfo.isAudio;
+  const isPending = message.id.startsWith('temp-');
+
   return (
     <div
-      className={`group relative flex gap-2.5 sm:gap-3 my-2 px-1 sm:px-3 ${
+      className={`group relative flex gap-2.5 sm:gap-3 my-2.5 px-1 sm:px-3 ${
         isMe ? 'flex-row-reverse' : 'flex-row'
       }`}
     >
@@ -96,7 +130,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       />
 
       {/* Message Bubble Container */}
-      <div className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[85%] sm:max-w-[75%] min-w-0 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
         
         {/* Sender Name & Time & WhatsApp-Style Double Checkmarks */}
         <div className="flex items-center gap-1.5 mb-1 px-1">
@@ -106,15 +140,35 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           <span className="text-[10px] text-cream-400 dark:text-cream-500">
             {formatMessageTime(message.created_at)}
           </span>
+
+          {/* WhatsApp Status Checkmarks: Clearly distinguished */}
           {isMe && (
-            <span
-              className="text-blush-500 dark:text-blush-400 font-bold text-[11px] tracking-tighter"
-              title={message.id.startsWith('temp-') ? 'Sending...' : 'Delivered & Seen'}
-            >
-              {message.id.startsWith('temp-') ? '⏱️' : '✓✓'}
+            <span className="inline-flex items-center select-none">
+              {isPending ? (
+                <span className="text-[10px] text-cream-400" title="Sending...">
+                  ⏱
+                </span>
+              ) : isPartnerOnline ? (
+                // WhatsApp Signature Seen Blue Double-Check
+                <span
+                  className="text-[#34B7F1] font-bold text-xs tracking-tighter"
+                  title="Seen by bestie"
+                >
+                  ✓✓
+                </span>
+              ) : (
+                // Delivered Gray Double-Check
+                <span
+                  className="text-cream-400 dark:text-cream-500 font-bold text-xs tracking-tighter"
+                  title="Delivered"
+                >
+                  ✓✓
+                </span>
+              )}
             </span>
           )}
-          {message.is_edited && !stickerInfo.isSticker && !gifInfo.isGif && !imageInfo.isImage && !audioInfo.isAudio && (
+
+          {message.is_edited && isTextOnly && (
             <span className="text-[10px] italic text-cream-400 dark:text-cream-500">
               (edited)
             </span>
@@ -135,10 +189,13 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         )}
 
-        {/* Message Content Area */}
-        <div className="relative">
+        {/* Message Content Area (with onContextMenu for right-click!) */}
+        <div
+          className="relative max-w-full"
+          onContextMenu={handleContextMenu}
+        >
           {isEditing ? (
-            <div className="p-2 rounded-2xl bg-cream-50 dark:bg-cozydark-850 border border-blush-300 dark:border-blush-700 shadow-sm w-72 sm:w-80">
+            <div className="p-2.5 rounded-2.5xl bg-cream-50 dark:bg-cozydark-850 border border-blush-300 dark:border-blush-700 shadow-sm w-72 sm:w-80">
               <textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
@@ -168,7 +225,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               <div
                 onClick={() => setImageLightboxOpen(true)}
                 className="group/img relative rounded-2.5xl overflow-hidden shadow-cozy border border-cream-200/80 dark:border-cozydark-700 bg-cream-100/50 dark:bg-cozydark-850 cursor-pointer hover:border-blush-400 dark:hover:border-blush-600 transition-all active:scale-[0.99]"
-                title="Click to view full screenshot"
+                title="Click to view full screenshot (or Right-click for options)"
               >
                 <img
                   src={imageInfo.imageUrl}
@@ -184,7 +241,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               </div>
               {imageInfo.caption && (
                 <div
-                  className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-xs ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-xs break-words [overflow-wrap:anywhere] ${
                     isMe
                       ? 'bg-gradient-to-br from-blush-200 via-blush-100 to-blush-200/90 text-blush-950 border border-blush-300/60 dark:from-blush-900/80 dark:via-blush-800/70 dark:to-blush-900/80 dark:text-cream-50'
                       : 'bg-white dark:bg-cozydark-800 border border-cream-200/80 dark:border-cozydark-700 text-cream-900 dark:text-cream-50'
@@ -241,9 +298,9 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               </span>
             </div>
           ) : (
-            /* Standard Text Message Bubble */
+            /* Standard Text Message Bubble with guaranteed wrapping */
             <div
-              className={`px-4 py-2.5 rounded-2.5xl text-sm leading-relaxed shadow-sm break-words select-text ${
+              className={`px-4 py-2.5 rounded-2.5xl text-sm leading-relaxed shadow-sm select-text break-words break-all [overflow-wrap:anywhere] max-w-full overflow-hidden ${
                 isMe
                   ? 'bg-gradient-to-br from-blush-200 via-blush-100 to-blush-200/90 text-blush-950 border border-blush-300/60 dark:from-blush-900/80 dark:via-blush-800/70 dark:to-blush-900/80 dark:text-cream-50 dark:border-blush-700/50 rounded-br-sm shadow-xs'
                   : 'bg-white dark:bg-cozydark-800 border border-cream-200/80 dark:border-cozydark-700 text-cream-900 dark:text-cream-50 rounded-bl-sm shadow-xs'
@@ -253,62 +310,75 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             </div>
           )}
 
-          {/* Floating Action Bar */}
+          {/* Floating Action Pill: Anchored securely above the bubble (NEVER overflows screen edges!) */}
           {!isEditing && (
             <div
-              className={`absolute top-0 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cream-50 dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 shadow-cozy ${
-                isMe ? 'right-full mr-2' : 'left-full ml-2'
-              }`}
+              className={`absolute -top-3.5 ${
+                isMe ? 'right-2' : 'left-2'
+              } opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-cream-50 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-700 shadow-md`}
             >
-              {/* Quick Reaction Button */}
               <button
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
-                title="Add reaction"
+                className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-200/70 dark:hover:bg-cozydark-750 transition-colors"
+                title="React"
               >
                 <Smile className="w-3.5 h-3.5" />
               </button>
 
-              {/* Reply Button */}
               <button
                 onClick={() => onReply(message)}
-                className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
+                className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-200/70 dark:hover:bg-cozydark-750 transition-colors"
                 title="Reply"
               >
                 <Reply className="w-3.5 h-3.5" />
               </button>
 
-              {/* Edit (only text) & Delete for author */}
               {isMe && (
                 <>
-                  {!stickerInfo.isSticker && !gifInfo.isGif && !imageInfo.isImage && !audioInfo.isAudio && (
+                  {isTextOnly && (
                     <button
                       onClick={() => {
                         setEditContent(message.content);
                         setIsEditing(true);
                       }}
-                      className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
-                      title="Edit message"
+                      className="p-1 rounded-full text-cream-500 hover:text-blush-500 hover:bg-cream-200/70 dark:hover:bg-cozydark-750 transition-colors"
+                      title="Edit"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                   <button
                     onClick={() => onDelete(message.id)}
-                    className="p-1 rounded-full text-cream-500 hover:text-rose-500 hover:bg-cream-100 dark:hover:bg-cozydark-700 transition-colors"
-                    title="Delete message"
+                    className="p-1 rounded-full text-cream-500 hover:text-rose-500 hover:bg-cream-200/70 dark:hover:bg-cozydark-750 transition-colors"
+                    title="Delete"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </>
               )}
+
+              {/* Mobile / Clickable More Options */}
+              <button
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setContextMenu({
+                    isOpen: true,
+                    x: rect.left,
+                    y: rect.bottom + 4,
+                  });
+                }}
+                className="p-1 rounded-full text-cream-500 hover:text-cream-700 dark:hover:text-cream-200 hover:bg-cream-200/70 dark:hover:bg-cozydark-750 transition-colors"
+                title="Options"
+              >
+                <MoreVertical className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
-          {/* Quick Floating Emoji Popover + More Emojis (+) */}
+          {/* Quick Floating Emoji Popover */}
           {showEmojiPicker && (
             <div
-              className={`absolute bottom-full mb-2 z-20 flex items-center gap-1 p-1.5 rounded-full bg-cream-50 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 shadow-cozy-lg animate-fade-in ${
+              className={`absolute bottom-full mb-2 z-30 flex items-center gap-1 p-1.5 rounded-full bg-cream-50 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 shadow-cozy-lg animate-fade-in ${
                 isMe ? 'right-0' : 'left-0'
               }`}
             >
@@ -362,6 +432,22 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         )}
       </div>
+
+      {/* WhatsApp Right-Click Context Menu */}
+      <MessageContextMenu
+        isOpen={contextMenu.isOpen}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        onClose={() => setContextMenu({ isOpen: false, x: 0, y: 0 })}
+        onReply={() => onReply(message)}
+        onCopy={handleCopy}
+        onEdit={isTextOnly ? () => { setEditContent(message.content); setIsEditing(true); } : undefined}
+        onDelete={() => onDelete(message.id)}
+        onReact={(emoji) => onToggleReaction(message.id, emoji)}
+        onOpenMoreEmojis={() => setFullEmojiModalOpen(true)}
+        isMe={isMe}
+        canEdit={isTextOnly}
+      />
 
       {/* Full Emoji Picker Modal for reaction */}
       <EmojiPickerModal

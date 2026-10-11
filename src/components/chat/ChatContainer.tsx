@@ -175,6 +175,7 @@ export const ChatContainer: React.FC = () => {
                 onEdit={editMessage}
                 onDelete={deleteMessage}
                 onToggleReaction={toggleReaction}
+                isPartnerOnline={isPartnerOnline}
               />
             ))}
 

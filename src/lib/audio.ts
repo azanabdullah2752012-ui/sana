@@ -14,16 +14,24 @@ export function encodeAudioMessage(audioUrl: string, durationSec: number): strin
 export function parseAudioMessage(content: string): AudioMessageInfo {
   if (!content) return { isAudio: false };
 
-  const match = content.match(/^\[voice:(data:audio\/[a-zA-Z0-9]+;base64,[A-Za-z0-9+/=]+|https?:\/\/[^:]+):(\d+)\]$/);
-  if (match) {
-    return {
-      isAudio: true,
-      audioUrl: match[1],
-      durationSec: parseInt(match[2], 10) || 0,
-    };
+  // Parse [voice:url:durationSec] safely with lastIndexOf
+  if (content.startsWith('[voice:') && content.endsWith(']')) {
+    const inner = content.slice(7, -1);
+    const lastColon = inner.lastIndexOf(':');
+    if (lastColon !== -1) {
+      const audioUrl = inner.slice(0, lastColon);
+      const durationSec = parseInt(inner.slice(lastColon + 1), 10) || 0;
+      if (
+        audioUrl.startsWith('data:audio/') ||
+        audioUrl.startsWith('http://') ||
+        audioUrl.startsWith('https://')
+      ) {
+        return { isAudio: true, audioUrl, durationSec };
+      }
+    }
   }
 
-  // Raw audio base64 fallback
+  // Raw audio data URL fallback
   if (content.startsWith('data:audio/')) {
     return {
       isAudio: true,
