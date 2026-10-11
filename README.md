@@ -2,26 +2,29 @@
 
 A soft, cozy, and private sanctuary built for two friends using **React, Vite, TypeScript, Tailwind CSS, and Supabase**.
 
-Designed with warm cream backgrounds, blush pink accents, pastel lavender, rounded cards, subtle shadows, gentle animations, and mobile-first layouts.
+Protected by secret passcodes:
+- ☕ **Azan's Passcode:** `azanisthebest`
+- 🌸 **Sana's Passcode:** `sanaisthebest`
+
+**No email sign-up, no email confirmation links, and zero email rate limits.**
 
 ---
 
 ## ☕ Key Features
 
 ### 1. Landing Page & Welcoming Dashboard
-- **Welcoming Hero:** Soft typography with custom title, blossom animations, and personalized greetings.
+- **Secret Passcode Gate:** Enter `azanisthebest` or `sanaisthebest` to unlock your respective persona immediately.
 - **Partner Presence Card:** Real-time online/activity card showing partner's avatar, bio, and quick-chat shortcut.
 - **Home Hub:** Daily question glance, upcoming countdowns, recent scrapbook photos, and pinned notes.
 
 ### 2. Strict 2-Person Security & Access Control
-- **Supabase Authentication:** Secure email/password login, signup, password reset, and session persistence.
-- **Invite-Only Whitelist:** Restricted to **exactly two authorized user accounts** (`member_1` and `member_2`).
-- **PostgreSQL Row Level Security (RLS):** Every table enforces database-level policies checked by `is_approved_member(auth.uid())`. Unauthorized users cannot read, insert, update, or delete any data—even if they bypass the React frontend.
-- **Max-2 Trigger:** Database trigger prevents inserting more than two accounts into `authorized_members`.
+- **No Email Hassle:** Direct authentication via your secret passcodes, persistent across sessions and browser restarts.
+- **Invite-Only Whitelist:** Restricted to **exactly two authorized user accounts** (`user-azan-001` and `user-sana-002`).
+- **PostgreSQL Row Level Security (RLS):** Every table enforces database-level policies checked by `sender_id IN ('user-azan-001', 'user-sana-002')`. Unauthorized users cannot read or write any data.
 - **Client Security:** No `service_role` secrets or private credentials are ever exposed in client code.
 
 ### 3. Real-Time Private Chat
-- **1-on-1 Shared Conversation:** Single dedicated channel between the two approved users.
+- **1-on-1 Shared Conversation:** Single dedicated channel between Azan and Sana.
 - **Supabase Realtime:** Instant message delivery across devices.
 - **Message Replies:** Quote and reply to previous messages with context banners.
 - **Emoji Reactions:** Quick floating bar (🌸, 💖, ☕, 🍰, ✨, etc.) with reaction counts.
@@ -30,7 +33,7 @@ Designed with warm cream backgrounds, blush pink accents, pastel lavender, round
 
 ### 4. Shared Memories (Digital Scrapbook)
 - **Polaroid-style Memory Cards:** Title, story description, date, location tag, and tags.
-- **Supabase Storage:** Private bucket (`memory-images`) with strict RLS storage policies and signed URLs.
+- **Supabase Storage:** Storage bucket (`memory-images`) with photo upload and lightbox zoom.
 - **Favorites & Search:** One-click heart favorite toggle and instant search.
 - **Lightbox Viewer:** Fullscreen zoom for high-res photo viewing.
 
@@ -50,7 +53,7 @@ Designed with warm cream backgrounds, blush pink accents, pastel lavender, round
 - **Theme Switcher:** Light mode, cozy dark mode (deep obsidian-violet slate), and system preference.
 - **Accent Palettes:** Blush Pink, Pastel Lavender, and Cream.
 - **Profile Customization:** Display name, bio, and curated aesthetic avatars.
-- **Security Badge:** Real-time verification badge confirming approved member status (e.g. `member_1` or `member_2`).
+- **Quick Switcher:** Instant persona switcher between Azan and Sana in the top navigation bar.
 
 ---
 
@@ -63,80 +66,24 @@ Designed with warm cream backgrounds, blush pink accents, pastel lavender, round
 
 ---
 
-## 🗄️ Database Schema & Security (`supabase/schema.sql`)
-
-The repository includes a complete, production-ready SQL migration:
-
-| Table | Description | RLS Policy Summary |
-|---|---|---|
-| `authorized_members` | Whitelist table of the 2 authorized emails | Read only if approved; client writes strictly blocked (`WITH CHECK (false)`) |
-| `profiles` | User profiles (names, bio, avatars, theme) | Read by approved members; write only for own user (`id = auth.uid()`) |
-| `conversations` | Private conversation container | Read/Write only if `is_approved_member(auth.uid())` |
-| `messages` | Chat messages with replies & edit status | Read by approved members; write/edit/delete only for author |
-| `message_reactions` | Emoji reactions on messages | Read by approved members; insert/delete only by author |
-| `memories` | Digital scrapbook memories & photos | Read/Write/Delete only if `is_approved_member(auth.uid())` |
-| `notes` | Shared notebook with category & pin status | Read/Write/Edit by approved members with author tracking |
-| `daily_prompts` | Daily reflection questions | Read by approved members |
-| `daily_answers` | Daily answers by both users | Read by approved members; upsert only for own answer |
-| `bucket_list_items` | Shared adventures wishlist | Read/Write/Complete by approved members |
-| `special_dates` | Countdowns & anniversaries | Read/Write/Delete by approved members |
-| `user_preferences` | Widget toggles and display settings | Read/Write only for own user |
-| `storage.objects` (`memory-images`) | Private image bucket | Upload/view only allowed if `is_approved_member(auth.uid())` |
-
----
-
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
 - Node.js 18+ (Node 20+ or 24 recommended)
-- A Supabase account (free tier works great)
+- Your Supabase project (`https://vxsushxqhqpjwayadqyj.supabase.co`)
 
-### 2. Clone & Install
-```bash
-git clone <your-repo>
-cd s
-npm install
-```
+### 2. Run Database Setup in Supabase
+1. Open your **[Supabase Dashboard](https://supabase.com/dashboard/project/vxsushxqhqpjwayadqyj)**.
+2. In the left sidebar, click **SQL Editor**.
+3. Open `supabase/schema.sql`, copy all contents, paste into the editor, and click **Run**.
+4. (Optional) Open `supabase/seed.sql`, copy all contents, paste into the editor, and click **Run** to load initial sample memories, notes, and countdowns.
 
-### 3. Supabase Setup
-1. Create a new project in the [Supabase Dashboard](https://supabase.com).
-2. Go to **SQL Editor** in your Supabase dashboard.
-3. Open `supabase/schema.sql` and run it. This creates all tables, triggers, functions, storage bucket, and RLS policies.
-4. Open `supabase/seed.sql`, replace the placeholder emails (`azan@example.com` and `sana@example.com`) with your actual email addresses, and run the script.
-5. In **Project Settings -> API**, copy your **Project URL** and **anon public key**.
-
-### 4. Configure Environment Variables
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
-```
-Update `.env` with your public Supabase credentials:
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key
-```
-
-### 5. Run Local Development Server
+### 3. Run the App
 ```bash
 npm run dev
 ```
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
----
-
-## 💡 Out-of-the-Box Demo Mode
-
-If you run the app before connecting Supabase (or leave `.env` empty), the app automatically enters **Demo Mode**:
-- Pre-loaded with warm demo memories, chat history, inside jokes, and bucket list items.
-- A **Demo Persona Switcher** appears in the top navigation and settings to let you switch between **Azan** and **Sana** with 1 click.
-- Test message replies, emoji reactions, photo scrapbook uploads, note pinning, and bucket list completions locally with instant state synchronization.
-- Test the strict gatekeeper by typing an unauthorized email during sign-up to see the RLS access denial screen.
-
----
-
-## 📦 Build for Production
-```bash
-npm run build
-npm run preview
-```
-Production assets are generated in `dist/` with optimal chunk splitting (`vendor`, `supabase`, `icons`).
+- Type `azanisthebest` to enter as **Azan ☕**.
+- Type `sanaisthebest` to enter as **Sana 🌸**.
+- Anyone typing an incorrect passcode is politely blocked at the gate.

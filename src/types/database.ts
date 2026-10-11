@@ -4,7 +4,7 @@ export type AccentColor = 'blush' | 'lavender' | 'cream';
 
 export interface UserProfile {
   id: string;
-  email: string;
+  email?: string;
   display_name: string;
   avatar_url?: string | null;
   bio?: string | null;
@@ -17,7 +17,7 @@ export interface UserProfile {
 export interface AuthorizedMember {
   id: string;
   user_id: string | null;
-  email: string;
+  email?: string;
   display_name: string;
   role: UserRole;
   is_approved: boolean;

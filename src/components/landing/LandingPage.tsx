@@ -134,35 +134,35 @@ export const LandingPage: React.FC = () => {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md mb-12">
+        <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full justify-center max-w-lg mb-10">
           <button
-            onClick={() => openAuth('signin')}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-blush-400 via-blush-500 to-blush-600 hover:from-blush-500 hover:to-blush-700 text-white font-medium text-base shadow-cozy hover:shadow-cozy-lg flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
+            onClick={() => switchDemoUser('azan')}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blush-400 to-blush-500 hover:from-blush-500 hover:to-blush-600 text-white font-medium text-sm shadow-cozy hover:shadow-cozy-lg flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
           >
-            <span>Enter Our Space</span>
+            <span>Enter as Azan ☕</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
-            onClick={() => switchDemoUser('azan')}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-cream-100/90 dark:bg-cozydark-850 border border-cream-300 dark:border-cozydark-800 text-cream-800 dark:text-cream-200 font-medium text-sm hover:bg-cream-200/80 dark:hover:bg-cozydark-800 transition-all flex items-center justify-center gap-2 shadow-sm"
+            onClick={() => switchDemoUser('sana')}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-lavender-400 to-lavender-500 hover:from-lavender-500 hover:to-lavender-600 text-white font-medium text-sm shadow-cozy hover:shadow-cozy-lg flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
           >
-            <Coffee className="w-4 h-4 text-cream-500" />
-            <span>Instant Preview (Azan)</span>
+            <span>Enter as Sana 🌸</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
-            onClick={() => switchDemoUser('sana')}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-cream-100/90 dark:bg-cozydark-850 border border-cream-300 dark:border-cozydark-800 text-cream-800 dark:text-cream-200 font-medium text-sm hover:bg-cream-200/80 dark:hover:bg-cozydark-800 transition-all flex items-center justify-center gap-2 shadow-sm"
+            onClick={() => openAuth('signin')}
+            className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-cream-100/90 dark:bg-cozydark-850 border border-cream-300 dark:border-cozydark-800 text-cream-800 dark:text-cream-200 font-medium text-sm hover:bg-cream-200/80 dark:hover:bg-cozydark-800 transition-all flex items-center justify-center gap-2 shadow-sm"
           >
-            <span>Preview (Sana) 🌸</span>
+            <span>Enter Passcode 🔑</span>
           </button>
         </div>
 
         {/* Access Control Security Tag */}
-        <div className="inline-flex items-center gap-2 text-xs text-cream-500 dark:text-cream-400 bg-cream-100/60 dark:bg-cozydark-900/60 px-4 py-2 rounded-full border border-cream-200 dark:border-cozydark-800 mb-14">
+        <div className="inline-flex items-center gap-2 text-xs text-cream-600 dark:text-cream-300 bg-cream-100/80 dark:bg-cozydark-900/80 px-4 py-2 rounded-full border border-cream-200 dark:border-cozydark-800 mb-14">
           <Shield className="w-3.5 h-3.5 text-emerald-500" />
-          <span>Strict 2-User Access Control &amp; Row Level Security Enabled</span>
+          <span>Passcode Protected • Azan (<code className="text-blush-600 dark:text-blush-300">azanisthebest</code>) &amp; Sana (<code className="text-lavender-600 dark:text-lavender-300">sanaisthebest</code>)</span>
         </div>
 
         {/* Feature Cards Grid */}

@@ -238,45 +238,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             All private tables (messages, memories, notes, answers) enforce strict PostgreSQL Row Level Security. Only the two verified accounts are permitted access.
           </p>
 
-          <div className="pt-1 text-[10px] text-cream-500 dark:text-cream-500">
-            Account: <code>{profile?.email}</code>
+          <div className="pt-1 text-[10px] text-cream-500 dark:text-cream-400">
+            Current Member: <strong>{profile?.display_name}</strong> (Secret passcode: <code>{profile?.id.includes('azan') ? 'azanisthebest' : 'sanaisthebest'}</code>)
           </div>
         </div>
 
-        {/* Mock Mode Switcher (if running in preview mode) */}
-        {isMockMode && (
-          <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs">
-            <p className="font-semibold text-amber-800 dark:text-amber-200 mb-1 flex items-center gap-1.5">
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Demo Persona Switcher</span>
-            </p>
-            <p className="text-[11px] text-amber-700 dark:text-amber-300 mb-2">
-              Toggle between Azan and Sana to preview the app from both perspectives:
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  switchDemoUser('azan');
-                  onClose();
-                }}
-                className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-900 dark:text-amber-100 font-medium text-xs hover:bg-amber-200"
-              >
-                Switch to Azan
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  switchDemoUser('sana');
-                  onClose();
-                }}
-                className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-900 dark:text-amber-100 font-medium text-xs hover:bg-amber-200"
-              >
-                Switch to Sana
-              </button>
-            </div>
+        {/* Persona Switcher */}
+        <div className="p-3 rounded-2xl bg-cream-100/60 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-800 text-xs">
+          <p className="font-semibold text-cream-800 dark:text-cream-200 mb-1 flex items-center gap-1.5">
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Switch Persona</span>
+          </p>
+          <p className="text-[11px] text-cream-600 dark:text-cream-400 mb-2">
+            Switch between Azan and Sana to experience the sanctuary from both perspectives:
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                switchDemoUser('azan');
+                onClose();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-blush-100 dark:bg-blush-950/70 text-blush-800 dark:text-blush-200 font-medium text-xs hover:bg-blush-200 transition-colors"
+            >
+              Switch to Azan ☕
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                switchDemoUser('sana');
+                onClose();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-lavender-100 dark:bg-lavender-950/70 text-lavender-800 dark:text-lavender-200 font-medium text-xs hover:bg-lavender-200 transition-colors"
+            >
+              Switch to Sana 🌸
+            </button>
           </div>
-        )}
+        </div>
 
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-3 border-t border-cream-200/80 dark:border-cozydark-800">

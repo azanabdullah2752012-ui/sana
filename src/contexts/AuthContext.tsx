@@ -1,12 +1,21 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, checkDatabaseSchemaReady } from '../lib/supabase';
 import { UserProfile, AuthorizedMember } from '../types/database';
 import { MOCK_USER_AZAN, MOCK_USER_SANA, MOCK_AUTHORIZED_MEMBERS } from '../lib/mockData';
 
+export const AZAN_PASSCODE = 'azanisthebest';
+export const SANA_PASSCODE = 'sanaisthebest';
+
+const SESSION_STORAGE_KEY = 'sana_auth_session';
+
+export interface AuthUser {
+  id: string;
+  display_name: string;
+  role: 'member_1' | 'member_2';
+}
+
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
   profile: UserProfile | null;
   partnerProfile: UserProfile | null;
   authorizedMember: AuthorizedMember | null;
@@ -16,19 +25,17 @@ interface AuthContextType {
   isSchemaReady: boolean;
   schemaError: string | null;
   checkSchema: () => Promise<boolean>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null; needsApproval?: boolean }>;
+  signInWithPasscode: (passcode: string) => Promise<{ error: Error | null; user?: AuthUser }>;
+  signIn: (passcodeOrEmail: string, optionalPassword?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: Error | null }>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: Error | null }>;
-  switchDemoUser: (userType: 'azan' | 'sana' | 'unauthorized') => void;
+  switchDemoUser: (userType: 'azan' | 'sana') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [partnerProfile, setPartnerProfile] = useState<UserProfile | null>(null);
   const [authorizedMember, setAuthorizedMember] = useState<AuthorizedMember | null>(null);
@@ -36,96 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSchemaReady, setIsSchemaReady] = useState<boolean>(true);
   const [schemaError, setSchemaError] = useState<string | null>(null);
-  
-  // Track whether we are running in mock demo mode
   const [isMockMode, setIsMockMode] = useState<boolean>(!isSupabaseConfigured());
-  const [mockCurrentUserId, setMockCurrentUserId] = useState<string>(() => {
-    return localStorage.getItem('sana_mock_current_user') || MOCK_USER_AZAN.id;
-  });
-
-  // Load profiles and authorization details for Supabase user
-  const loadSupabaseUserData = useCallback(async (supabaseUser: User) => {
-    try {
-      // 1. Check if user is in authorized_members and approved
-      const { data: memberData, error: memberErr } = await supabase
-        .from('authorized_members')
-        .select('*')
-        .eq('user_id', supabaseUser.id)
-        .maybeSingle();
-
-      if (memberErr) {
-        console.warn('Error checking authorized_members:', memberErr);
-      }
-
-      if (memberData && memberData.is_approved) {
-        setIsApproved(true);
-        setAuthorizedMember(memberData);
-      } else {
-        // Double check by email in case user_id wasn't linked yet
-        const { data: memberByEmail } = await supabase
-          .from('authorized_members')
-          .select('*')
-          .ilike('email', supabaseUser.email || '')
-          .maybeSingle();
-
-        if (memberByEmail && memberByEmail.is_approved) {
-          setIsApproved(true);
-          setAuthorizedMember(memberByEmail);
-        } else {
-          setIsApproved(false);
-          setAuthorizedMember(null);
-        }
-      }
-
-      // 2. Fetch current user profile
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', supabaseUser.id)
-        .maybeSingle();
-
-      if (profileData) {
-        setProfile(profileData as UserProfile);
-      } else {
-        // Fallback default profile if not yet created by trigger
-        const defaultProfile: UserProfile = {
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          display_name: supabaseUser.user_metadata?.display_name || supabaseUser.email?.split('@')[0] || 'Friend',
-          avatar_url: supabaseUser.user_metadata?.avatar_url || null,
-          bio: 'Cozy memories & little moments ☕✨',
-          theme_preference: 'light',
-          accent_color: 'blush',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        setProfile(defaultProfile);
-      }
-
-      // 3. Fetch partner profile (the other approved member)
-      const { data: otherMembers } = await supabase
-        .from('authorized_members')
-        .select('user_id')
-        .neq('user_id', supabaseUser.id)
-        .eq('is_approved', true)
-        .maybeSingle();
-
-      if (otherMembers?.user_id) {
-        const { data: partnerData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', otherMembers.user_id)
-          .maybeSingle();
-
-        if (partnerData) {
-          setPartnerProfile(partnerData as UserProfile);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load user authorization:', err);
-      setIsApproved(false);
-    }
-  }, []);
 
   const checkSchema = useCallback(async () => {
     if (!isSupabaseConfigured()) {
@@ -139,208 +57,137 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res.ready;
   }, []);
 
-  // Setup Supabase or Mock initialization
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      // Running in Mock Mode
-      setIsMockMode(true);
-      applyMockUser(mockCurrentUserId);
-      setIsLoading(false);
-      return;
-    }
-
-    // Running in Real Supabase Mode
-    setIsMockMode(false);
-    checkSchema();
-
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      if (currentSession?.user) {
-        loadSupabaseUserData(currentSession.user).finally(() => {
-          setIsLoading(false);
-        });
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-      if (newSession?.user) {
-        await loadSupabaseUserData(newSession.user);
-      } else {
-        setProfile(null);
-        setPartnerProfile(null);
-        setAuthorizedMember(null);
-        setIsApproved(false);
-      }
-      setIsLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [loadSupabaseUserData, mockCurrentUserId]);
-
-  const applyMockUser = (mockId: string) => {
-    if (mockId === 'unauthorized') {
-      setUser({
-        id: 'unauthorized-user-999',
-        app_metadata: {},
-        user_metadata: { display_name: 'Visitor' },
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-        email: 'stranger@example.com',
-      } as User);
-      setProfile({
-        id: 'unauthorized-user-999',
-        email: 'stranger@example.com',
-        display_name: 'Visitor',
-        avatar_url: null,
-        bio: null,
-        theme_preference: 'light',
-        accent_color: 'cream',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-      setAuthorizedMember(null);
-      setIsApproved(false);
-      setPartnerProfile(null);
-      return;
-    }
-
-    const isAzan = mockId === MOCK_USER_AZAN.id;
-    const current = isAzan ? MOCK_USER_AZAN : MOCK_USER_SANA;
-    const partner = isAzan ? MOCK_USER_SANA : MOCK_USER_AZAN;
+  const loadUserDataForRole = useCallback(async (role: 'member_1' | 'member_2') => {
+    const isAzan = role === 'member_1';
+    const currentBase = isAzan ? MOCK_USER_AZAN : MOCK_USER_SANA;
+    const partnerBase = isAzan ? MOCK_USER_SANA : MOCK_USER_AZAN;
     const authRecord = isAzan ? MOCK_AUTHORIZED_MEMBERS[0] : MOCK_AUTHORIZED_MEMBERS[1];
 
-    setUser({
-      id: current.id,
-      app_metadata: {},
-      user_metadata: { display_name: current.display_name },
-      aud: 'authenticated',
-      created_at: current.created_at,
-      email: current.email,
-    } as User);
+    const authUser: AuthUser = {
+      id: currentBase.id,
+      display_name: currentBase.display_name,
+      role,
+    };
 
-    setProfile(current);
-    setPartnerProfile(partner);
+    setUser(authUser);
     setAuthorizedMember(authRecord);
     setIsApproved(true);
+
+    if (isSupabaseConfigured()) {
+      try {
+        // Try to fetch updated profile from Supabase profiles table
+        const { data: dbProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentBase.id)
+          .maybeSingle();
+
+        if (dbProfile) {
+          setProfile(dbProfile as UserProfile);
+        } else {
+          setProfile(currentBase);
+        }
+
+        // Fetch partner profile
+        const { data: dbPartner } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', partnerBase.id)
+          .maybeSingle();
+
+        if (dbPartner) {
+          setPartnerProfile(dbPartner as UserProfile);
+        } else {
+          setPartnerProfile(partnerBase);
+        }
+      } catch (e) {
+        setProfile(currentBase);
+        setPartnerProfile(partnerBase);
+      }
+    } else {
+      setProfile(currentBase);
+      setPartnerProfile(partnerBase);
+    }
+  }, []);
+
+  // Initialize session from localStorage or verify Supabase
+  useEffect(() => {
+    const init = async () => {
+      if (isSupabaseConfigured()) {
+        await checkSchema();
+      }
+
+      // Check saved passcode session
+      const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (savedSession) {
+        try {
+          const { passcode } = JSON.parse(savedSession);
+          if (passcode === AZAN_PASSCODE) {
+            await loadUserDataForRole('member_1');
+          } else if (passcode === SANA_PASSCODE) {
+            await loadUserDataForRole('member_2');
+          } else {
+            localStorage.removeItem(SESSION_STORAGE_KEY);
+          }
+        } catch (e) {
+          localStorage.removeItem(SESSION_STORAGE_KEY);
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    init();
+  }, [checkSchema, loadUserDataForRole]);
+
+  // Sign in with secret passcode
+  const signInWithPasscode = async (passcode: string): Promise<{ error: Error | null; user?: AuthUser }> => {
+    const trimmed = passcode.trim();
+
+    if (trimmed === AZAN_PASSCODE) {
+      await loadUserDataForRole('member_1');
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ passcode: AZAN_PASSCODE }));
+      return {
+        error: null,
+        user: { id: MOCK_USER_AZAN.id, display_name: 'Azan', role: 'member_1' },
+      };
+    }
+
+    if (trimmed === SANA_PASSCODE) {
+      await loadUserDataForRole('member_2');
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ passcode: SANA_PASSCODE }));
+      return {
+        error: null,
+        user: { id: MOCK_USER_SANA.id, display_name: 'Sana', role: 'member_2' },
+      };
+    }
+
+    return {
+      error: new Error('Incorrect secret passcode. This sanctuary is strictly for Azan and Sana 🌸'),
+    };
   };
 
-  const switchDemoUser = (userType: 'azan' | 'sana' | 'unauthorized') => {
-    let newId = MOCK_USER_AZAN.id;
-    if (userType === 'sana') newId = MOCK_USER_SANA.id;
-    if (userType === 'unauthorized') newId = 'unauthorized';
-
-    setMockCurrentUserId(newId);
-    localStorage.setItem('sana_mock_current_user', newId);
-    applyMockUser(newId);
-  };
-
-  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
-    if (isMockMode) {
-      if (email.toLowerCase().includes('sana')) {
-        switchDemoUser('sana');
-      } else if (email.toLowerCase().includes('azan')) {
-        switchDemoUser('azan');
-      } else {
-        switchDemoUser('unauthorized');
-      }
-      return { error: null };
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (error) return { error };
-      if (data.user) {
-        await loadSupabaseUserData(data.user);
-      }
-      return { error: null };
-    } catch (err: any) {
-      return { error: err };
-    }
-  };
-
-  const signUp = async (
-    email: string,
-    password: string,
-    displayName: string
-  ): Promise<{ error: Error | null; needsApproval?: boolean }> => {
-    if (isMockMode) {
-      // In mock mode, pretend user signed up
-      const isPreApproved =
-        email.toLowerCase().includes('sana') || email.toLowerCase().includes('azan');
-      if (isPreApproved) {
-        if (email.toLowerCase().includes('sana')) switchDemoUser('sana');
-        else switchDemoUser('azan');
-        return { error: null, needsApproval: false };
-      } else {
-        switchDemoUser('unauthorized');
-        return { error: null, needsApproval: true };
-      }
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: {
-            display_name: displayName.trim(),
-          },
-        },
-      });
-
-      if (error) return { error };
-
-      if (data.user) {
-        await loadSupabaseUserData(data.user);
-      }
-
-      return { error: null, needsApproval: !isApproved };
-    } catch (err: any) {
-      return { error: err };
-    }
+  // General signIn helper supporting single passcode or dual params
+  const signIn = async (passcodeOrEmail: string, optionalPassword?: string) => {
+    const code = optionalPassword || passcodeOrEmail;
+    const { error } = await signInWithPasscode(code);
+    return { error };
   };
 
   const signOut = async () => {
-    if (isMockMode) {
-      setUser(null);
-      setProfile(null);
-      setPartnerProfile(null);
-      setIsApproved(false);
-      return;
-    }
-
-    await supabase.auth.signOut();
+    localStorage.removeItem(SESSION_STORAGE_KEY);
     setUser(null);
     setProfile(null);
     setPartnerProfile(null);
+    setAuthorizedMember(null);
     setIsApproved(false);
   };
 
-  const resetPassword = async (email: string): Promise<{ error: Error | null }> => {
-    if (isMockMode) {
-      return { error: null };
-    }
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: window.location.origin,
-      });
-      return { error };
-    } catch (err: any) {
-      return { error: err };
+  const switchDemoUser = (userType: 'azan' | 'sana') => {
+    if (userType === 'azan') {
+      signInWithPasscode(AZAN_PASSCODE);
+    } else {
+      signInWithPasscode(SANA_PASSCODE);
     }
   };
 
@@ -355,35 +202,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setProfile(updated);
 
-    if (isMockMode) {
-      // Mock mode: update local profile
-      return { error: null };
+    if (isSupabaseConfigured() && isSchemaReady) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            display_name: updated.display_name,
+            avatar_url: updated.avatar_url,
+            bio: updated.bio,
+            theme_preference: updated.theme_preference,
+            accent_color: updated.accent_color,
+            updated_at: updated.updated_at,
+          })
+          .eq('id', profile.id);
+
+        return { error };
+      } catch (err: any) {
+        return { error: err };
+      }
     }
 
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          display_name: updated.display_name,
-          avatar_url: updated.avatar_url,
-          bio: updated.bio,
-          theme_preference: updated.theme_preference,
-          accent_color: updated.accent_color,
-          updated_at: updated.updated_at,
-        })
-        .eq('id', profile.id);
-
-      return { error };
-    } catch (err: any) {
-      return { error: err };
-    }
+    return { error: null };
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
         profile,
         partnerProfile,
         authorizedMember,
@@ -393,10 +238,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isSchemaReady,
         schemaError,
         checkSchema,
+        signInWithPasscode,
         signIn,
-        signUp,
         signOut,
-        resetPassword,
         updateProfile,
         switchDemoUser,
       }}

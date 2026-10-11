@@ -21,11 +21,7 @@ export const AccessDeniedScreen: React.FC = () => {
         </h2>
         <p className="text-sm text-cream-600 dark:text-cream-300 leading-relaxed mb-6">
           This is an invite-only space exclusively reserved for <strong>Sana</strong> and{' '}
-          <strong>Azan</strong>. Your account (
-          <code className="text-xs bg-cream-200/60 dark:bg-cozydark-800 px-1.5 py-0.5 rounded text-blush-600 dark:text-blush-300">
-            {user?.email || 'Unknown'}
-          </code>
-          ) is authenticated, but has not been whitelisted as one of the two approved members.
+          <strong>Azan</strong>. Access requires the secret passcode (<code className="text-xs bg-cream-200/60 dark:bg-cozydark-800 px-1.5 py-0.5 rounded text-blush-600 dark:text-blush-300">azanisthebest</code> or <code className="text-xs bg-cream-200/60 dark:bg-cozydark-800 px-1.5 py-0.5 rounded text-lavender-600 dark:text-lavender-300">sanaisthebest</code>).
         </p>
 
         <div className="p-4 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/70 dark:border-cozydark-800 text-left mb-6 text-xs text-cream-600 dark:text-cream-400 space-y-2">

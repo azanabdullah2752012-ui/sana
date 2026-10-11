@@ -68,19 +68,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </button>
 
-          {/* Quick Demo Mode switcher pill (helpful for testing two users) */}
-          {isMockMode && (
-            <div className="hidden lg:flex items-center ml-2">
-              <button
-                onClick={() => switchDemoUser(profile?.id.includes('azan') ? 'sana' : 'azan')}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-blush-100/70 dark:bg-blush-950/50 text-blush-700 dark:text-blush-300 border border-blush-200 dark:border-blush-800 hover:bg-blush-200/70 transition-colors"
-                title="Click to switch between Azan and Sana instantly"
-              >
-                <RefreshCw className="w-3 h-3 animate-spin-slow" />
-                <span>Viewing as <strong>{profile?.display_name || 'Azan'}</strong> (Switch)</span>
-              </button>
-            </div>
-          )}
+          {/* Quick Persona Switcher pill */}
+          <div className="hidden lg:flex items-center ml-2">
+            <button
+              onClick={() => switchDemoUser(profile?.id.includes('azan') ? 'sana' : 'azan')}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full bg-blush-100/70 dark:bg-blush-950/50 text-blush-700 dark:text-blush-300 border border-blush-200 dark:border-blush-800 hover:bg-blush-200/70 transition-colors"
+              title="Click to switch between Azan and Sana instantly"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>Viewing as <strong>{profile?.display_name || 'Azan'}</strong> (Switch)</span>
+            </button>
+          </div>
         </div>
 
         {/* Desktop Navigation Tabs */}
