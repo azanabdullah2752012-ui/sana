@@ -3,10 +3,20 @@
 -- ==============================================================================
 -- Run this entire script in Supabase SQL Editor.
 -- Safe to re-run multiple times without errors.
--- Passcodes:
---   Azan: azanisthebest
---   Sana: sanaisthebest
 -- ==============================================================================
+
+-- 0. SCHEMA MIGRATIONS (Safe to re-run anytime)
+DO $$ 
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'profiles'
+  ) THEN
+    ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_accent_color_check;
+    ALTER TABLE public.profiles ADD CONSTRAINT profiles_accent_color_check 
+      CHECK (accent_color IN ('blush', 'lavender', 'cream', 'rose', 'peach', 'mint', 'sky', 'violet'));
+  END IF;
+END $$;
 
 -- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -20,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   avatar_url text,
   bio text DEFAULT 'Sharing cozy memories & little moments ☕✨',
   theme_preference text DEFAULT 'light' CHECK (theme_preference IN ('light', 'dark', 'system')),
-  accent_color text DEFAULT 'blush' CHECK (accent_color IN ('blush', 'lavender', 'cream')),
+  accent_color text DEFAULT 'blush' CHECK (accent_color IN ('blush', 'lavender', 'cream', 'rose', 'peach', 'mint', 'sky', 'violet')),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );

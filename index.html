@@ -16,7 +16,8 @@
           var pref = localStorage.getItem('sana_theme_pref');
           var accent = localStorage.getItem('sana_accent_color') || 'blush';
           document.documentElement.setAttribute('data-accent', accent);
-          if (pref === 'dark' || (!pref && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          var isDark = pref === 'dark' || ((!pref || pref === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
             document.documentElement.classList.add('dark');
           } else {
             document.documentElement.classList.remove('dark');

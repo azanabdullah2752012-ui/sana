@@ -39,6 +39,7 @@
 
 /* 1. Blush Pink (Default) */
 :root,
+html[data-accent="blush"],
 [data-accent="blush"] {
   --accent-50: 255 247 248;
   --accent-100: 255 235 240;
@@ -54,6 +55,7 @@
 }
 
 /* 2. Pastel Lavender */
+html[data-accent="lavender"],
 [data-accent="lavender"] {
   --accent-50: 250 248 255;
   --accent-100: 243 237 253;
@@ -69,6 +71,7 @@
 }
 
 /* 3. Dusty Rose */
+html[data-accent="rose"],
 [data-accent="rose"] {
   --accent-50: 255 241 242;
   --accent-100: 255 228 230;
@@ -84,6 +87,7 @@
 }
 
 /* 4. Warm Peach */
+html[data-accent="peach"],
 [data-accent="peach"] {
   --accent-50: 255 247 237;
   --accent-100: 255 237 213;
@@ -99,6 +103,7 @@
 }
 
 /* 5. Sage Mint */
+html[data-accent="mint"],
 [data-accent="mint"] {
   --accent-50: 240 253 244;
   --accent-100: 220 252 231;
@@ -114,6 +119,7 @@
 }
 
 /* 6. Soft Sky */
+html[data-accent="sky"],
 [data-accent="sky"] {
   --accent-50: 240 249 255;
   --accent-100: 224 242 254;
@@ -129,6 +135,7 @@
 }
 
 /* 7. Royal Violet */
+html[data-accent="violet"],
 [data-accent="violet"] {
   --accent-50: 245 243 255;
   --accent-100: 237 233 254;
@@ -144,6 +151,7 @@
 }
 
 /* 8. Toasted Cream */
+html[data-accent="cream"],
 [data-accent="cream"] {
   --accent-50: 253 252 247;
   --accent-100: 250 246 237;

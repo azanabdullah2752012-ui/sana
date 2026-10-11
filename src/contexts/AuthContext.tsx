@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { supabase, isSupabaseConfigured, checkDatabaseSchemaReady } from '../lib/supabase';
 import { UserProfile, AuthorizedMember } from '../types/database';
 import { BASE_USER_AZAN, BASE_USER_SANA, BASE_AUTHORIZED_MEMBERS } from '../lib/mockData';
+import { useTheme } from './ThemeContext';
 
 const AZAN_PASSCODE = 'azanisthebest';
 const SANA_PASSCODE = 'sanaisthebest';
@@ -33,6 +34,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { setThemePreference, setAccentColor } = useTheme();
+
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [partnerProfile, setPartnerProfile] = useState<UserProfile | null>(null);
@@ -80,7 +83,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .maybeSingle();
 
         if (dbProfile) {
-          setProfile(dbProfile as UserProfile);
+          const loaded = dbProfile as UserProfile;
+          setProfile(loaded);
+          // Sync stored preferences directly into ThemeContext and DOM
+          if (loaded.theme_preference) {
+            setThemePreference(loaded.theme_preference);
+          }
+          if (loaded.accent_color) {
+            setAccentColor(loaded.accent_color);
+          }
         } else {
           setProfile(currentBase);
         }
@@ -105,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(currentBase);
       setPartnerProfile(partnerBase);
     }
-  }, []);
+  }, [setThemePreference, setAccentColor]);
 
   // Initialize session from localStorage or verify Supabase
   useEffect(() => {
@@ -181,6 +192,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (updates: Partial<UserProfile>): Promise<{ error: Error | null }> => {
     if (!profile) return { error: new Error('No active profile') };
 
+    // 1. Immediately apply theme and accent to ThemeContext & DOM & localStorage
+    if (updates.theme_preference) {
+      setThemePreference(updates.theme_preference);
+    }
+    if (updates.accent_color) {
+      setAccentColor(updates.accent_color);
+    }
+
     const updated = {
       ...profile,
       ...updates,
@@ -203,9 +222,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           })
           .eq('id', profile.id);
 
-        return { error };
+        if (error) {
+          // If Supabase table has the old 3-color check constraint (profiles_accent_color_check),
+          // fallback to updating non-accent fields in Supabase so display name/photo/bio still succeed!
+          if (
+            error.message &&
+            (error.message.includes('profiles_accent_color_check') ||
+              error.message.includes('check constraint'))
+          ) {
+            console.warn(
+              'Supabase constraint profiles_accent_color_check active. Falling back to non-accent fields in DB; chosen theme preserved locally.'
+            );
+            const fallbackRes = await supabase
+              .from('profiles')
+              .update({
+                display_name: updated.display_name,
+                avatar_url: updated.avatar_url,
+                bio: updated.bio,
+                theme_preference: updated.theme_preference,
+                updated_at: updated.updated_at,
+              })
+              .eq('id', profile.id);
+
+            return { error: fallbackRes.error ? new Error(fallbackRes.error.message) : null };
+          }
+
+          return { error: new Error(error.message) };
+        }
+
+        return { error: null };
       } catch (err: any) {
-        return { error: err };
+        return { error: err instanceof Error ? err : new Error(String(err)) };
       }
     }
 

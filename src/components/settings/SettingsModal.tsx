@@ -261,12 +261,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     onClick={() => setAccentColor(col.id)}
                     className={`flex items-center gap-2 p-2 rounded-2xl border transition-all ${
                       isSelected
-                        ? 'border-cream-800 dark:border-white bg-cream-100 dark:bg-cozydark-800 font-semibold shadow-xs'
+                        ? 'border-blush-500/80 dark:border-blush-400/80 bg-cream-100 dark:bg-cozydark-800 font-semibold shadow-xs ring-1 ring-blush-400/40'
                         : 'border-cream-200/80 dark:border-cozydark-800 hover:bg-cream-100/50'
                     }`}
                   >
-                    <span className={`w-4 h-4 rounded-full ${col.bg} shrink-0`} />
+                    <span className={`w-4 h-4 rounded-full ${col.bg} shrink-0 shadow-xs`} />
                     <span className="text-xs text-cream-800 dark:text-cream-200">{col.label}</span>
+                    {isSelected && (
+                      <Check className="w-3.5 h-3.5 ml-auto text-blush-500 dark:text-blush-400 shrink-0" />
+                    )}
                   </button>
                 );
               })}
