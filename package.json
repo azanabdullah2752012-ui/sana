@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && cp -r dist/assets . && cp dist/.nojekyll . && cp dist/404.html . && rm -rf docs && cp -r dist docs",
+    "deploy": "npm run build && gh-pages -d dist --dotfiles --nojekyll",
     "preview": "vite preview"
   },
   "dependencies": {

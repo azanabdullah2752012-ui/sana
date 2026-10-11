@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Sana &amp; Me — Our Cozy Space</title>
+    <meta name="description" content="A private, soft, and cozy sanctuary for memories, conversations, and everyday moments." />
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Instant Theme & Dark Mode Pre-hydration -->
+    <script>
+      (function() {
+        try {
+          var pref = localStorage.getItem('sana_theme_pref');
+          var accent = localStorage.getItem('sana_accent_color') || 'blush';
+          document.documentElement.setAttribute('data-accent', accent);
+          var isDark = pref === 'dark' || ((!pref || pref === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="./assets/index-1vgfDDsm.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/icons-BuKpwgrW.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-Njpq_Xje.js">
+    <link rel="modulepreload" crossorigin href="./assets/supabase-B12s50R_.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-TLOwaM4b.css">
+  </head>
+  <body class="bg-cream-100 text-cream-900 dark:bg-cozydark-950 dark:text-cream-100 antialiased selection:bg-blush-200 dark:selection:bg-blush-900 selection:text-blush-900 dark:selection:text-blush-100 min-h-screen">
+    <div id="root"></div>
+    <script>
+      (function() {
+        // Fallback loader for static hosting (e.g. GitHub Pages serving repo root without build action)
+        if (
+          (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:') &&
+          !document.querySelector('script[src*="./assets/"]')
+        ) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.crossOrigin = 'anonymous';
+          link.href = './assets/index-TLOwaM4b.css';
+          document.head.appendChild(link);
+
+          var script = document.createElement('script');
+          script.type = 'module';
+          script.crossOrigin = 'anonymous';
+          script.src = './assets/index-1vgfDDsm.js';
+          document.body.appendChild(script);
+        }
+      })();
+    </script>
+  </body>
+</html>
