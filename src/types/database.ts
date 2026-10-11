@@ -151,3 +151,16 @@ export interface UserPreferences {
   };
   updated_at: string;
 }
+
+export type KindnessCategory = 'treat' | 'support' | 'thoughtful' | 'laughter' | 'help' | 'other';
+
+export interface KindnessPointEntry {
+  id: string;
+  recipient_id: string; // 'user-azan-001' or 'user-sana-002'
+  giver_id: string;     // 'user-azan-001' or 'user-sana-002'
+  points: number;       // default 1
+  reason: string;
+  category: KindnessCategory;
+  created_at: string;
+}
+

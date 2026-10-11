@@ -4,6 +4,7 @@ import { useMemories } from '../../hooks/useMemories';
 import { useNotes } from '../../hooks/useNotes';
 import { useSpecialDates } from '../../hooks/useSpecialDates';
 import { useDailyPrompt } from '../../hooks/useDailyPrompt';
+import { useKindnessPoints } from '../../hooks/useKindnessPoints';
 import { Avatar } from '../common/Avatar';
 import { ActiveTab } from '../common/Navbar';
 import { QuestionGeneratorModal } from '../activities/QuestionGeneratorModal';
@@ -18,6 +19,7 @@ import {
   ArrowRight,
   Send,
   Pin,
+  Star,
 } from 'lucide-react';
 
 interface DashboardOverviewProps {
@@ -34,6 +36,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const { notes } = useNotes();
   const { dates, getDaysUntil } = useSpecialDates();
   const { prompt, myAnswer, partnerAnswer } = useDailyPrompt();
+  const { azanPoints, sanaPoints, totalKindnesses } = useKindnessPoints();
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
 
   const getGreetingTime = () => {
@@ -244,6 +247,36 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             className="w-full py-2 rounded-xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 dark:hover:bg-cozydark-800 text-cream-700 dark:text-cream-300 text-xs font-medium text-center transition-colors"
           >
             All Dates &amp; Milestones
+          </button>
+        </div>
+      </div>
+
+      {/* Bestie Kindness Points Quick Bar */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-cream-50/90 dark:bg-cozydark-900/90 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-500 shrink-0">
+            <Star className="w-5 h-5 fill-amber-400" />
+          </div>
+          <div>
+            <h4 className="font-serif font-semibold text-sm text-cream-900 dark:text-cream-50 flex items-center gap-2">
+              <span>Bestie Kindness Points</span>
+              <span className="text-[11px] font-normal text-cream-500">({totalKindnesses} sweet deeds)</span>
+            </h4>
+            <div className="flex items-center gap-3 mt-0.5 text-xs">
+              <span className="font-medium text-amber-600 dark:text-amber-400">Azan: <strong>{azanPoints} pts</strong> ⭐</span>
+              <span className="text-cream-300 dark:text-cozydark-600">•</span>
+              <span className="font-medium text-blush-600 dark:text-blush-400">Sana: <strong>{sanaPoints} pts</strong> 🌸</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab('activities')}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/10 to-blush-500/10 hover:from-amber-500/20 hover:to-blush-500/20 text-cream-800 dark:text-cream-200 text-xs font-medium border border-amber-200/80 dark:border-cozydark-700 transition-colors flex items-center gap-1.5"
+          >
+            <span>Open Points Tracker</span>
+            <ArrowRight className="w-3.5 h-3.5 text-blush-500" />
           </button>
         </div>
       </div>

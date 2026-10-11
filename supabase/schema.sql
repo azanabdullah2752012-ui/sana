@@ -148,6 +148,17 @@ CREATE TABLE IF NOT EXISTS public.special_dates (
   created_at timestamptz DEFAULT now()
 );
 
+-- 10. BESTIE KINDNESS POINTS & DEEDS TRACKER
+CREATE TABLE IF NOT EXISTS public.kindness_points (
+  id text PRIMARY KEY DEFAULT ('pt-' || gen_random_uuid()::text),
+  recipient_id text NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE CHECK (recipient_id IN ('user-azan-001', 'user-sana-002')),
+  giver_id text NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE CHECK (giver_id IN ('user-azan-001', 'user-sana-002')),
+  points integer NOT NULL DEFAULT 1 CHECK (points > 0),
+  reason text NOT NULL,
+  category text DEFAULT 'thoughtful' CHECK (category IN ('treat', 'support', 'thoughtful', 'laughter', 'help', 'other')),
+  created_at timestamptz DEFAULT now()
+);
+
 -- ==============================================================================
 -- INITIAL PROFILES & CONVERSATION
 -- ==============================================================================
@@ -314,6 +325,21 @@ CREATE POLICY "special_dates_update" ON public.special_dates FOR UPDATE USING (t
 DROP POLICY IF EXISTS "special_dates_delete" ON public.special_dates;
 CREATE POLICY "special_dates_delete" ON public.special_dates FOR DELETE USING (true);
 
+-- Kindness Points Policies
+ALTER TABLE public.kindness_points ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "kindness_select" ON public.kindness_points;
+CREATE POLICY "kindness_select" ON public.kindness_points FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "kindness_insert" ON public.kindness_points;
+CREATE POLICY "kindness_insert" ON public.kindness_points FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "kindness_update" ON public.kindness_points;
+CREATE POLICY "kindness_update" ON public.kindness_points FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "kindness_delete" ON public.kindness_points;
+CREATE POLICY "kindness_delete" ON public.kindness_points FOR DELETE USING (true);
+
 -- ==============================================================================
 -- STORAGE CONFIGURATION
 -- ==============================================================================
@@ -357,4 +383,5 @@ BEGIN
   BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.notes; EXCEPTION WHEN duplicate_object THEN END;
   BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.daily_answers; EXCEPTION WHEN duplicate_object THEN END;
   BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.bucket_list_items; EXCEPTION WHEN duplicate_object THEN END;
+  BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.kindness_points; EXCEPTION WHEN duplicate_object THEN END;
 END $$;

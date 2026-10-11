@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DailyPromptWidget } from './DailyPromptWidget';
+import { KindnessPointsTracker } from './KindnessPointsTracker';
 import { BucketListView } from './BucketListView';
 import { SpecialDatesView } from './SpecialDatesView';
 import { QuestionGeneratorModal } from './QuestionGeneratorModal';
@@ -24,7 +25,7 @@ export const ActivitiesView: React.FC<ActivitiesViewProps> = ({ onSendToChat }) 
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-cream-600 dark:text-cream-400 font-light">
-            Daily questions, cozy bucket lists, countdowns, and fun conversation starters.
+            Bestie kindness points tracker, daily questions, bucket lists, and milestones.
           </p>
         </div>
 
@@ -38,7 +39,12 @@ export const ActivitiesView: React.FC<ActivitiesViewProps> = ({ onSendToChat }) 
         </button>
       </div>
 
-      {/* 1. Daily Reflection Prompt */}
+      {/* 1. Bestie Kindness Points Tracker */}
+      <section>
+        <KindnessPointsTracker />
+      </section>
+
+      {/* 2. Daily Reflection Prompt */}
       <section>
         <DailyPromptWidget />
       </section>

@@ -23,7 +23,9 @@ import {
   Monitor,
   Trash2,
   Image as ImageIcon,
+  Smartphone,
 } from 'lucide-react';
+import { InstallPwaModal } from '../common/InstallPwaModal';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -52,6 +54,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
   const [klipyApiKeyInput, setKlipyApiKeyInput] = useState(() => getKlipyApiKey());
+  const [installModalOpen, setInstallModalOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -174,6 +177,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -466,7 +470,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* 4. Security Status Badge */}
+        {/* 4. Mobile App & Home Screen */}
+        <div className="p-3.5 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-750 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blush-100 dark:bg-blush-950/70 border border-blush-200 dark:border-blush-800 flex items-center justify-center text-blush-500 shrink-0">
+              <Smartphone className="w-4 h-4" />
+            </div>
+            <div>
+              <h5 className="font-serif font-semibold text-xs text-cream-900 dark:text-cream-100">
+                Install Mobile App
+              </h5>
+              <p className="text-[10px] text-cream-500 dark:text-cream-400">
+                Add to your iPhone or Android Home Screen with custom 🌸 icon
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setInstallModalOpen(true)}
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs font-medium text-cream-800 dark:text-cream-200 hover:bg-cream-100 dark:hover:bg-cozydark-750 transition-colors shadow-2xs"
+          >
+            Install
+          </button>
+        </div>
+
+        {/* 5. Security Status Badge */}
         <div className="p-4 rounded-2xl bg-cream-100/60 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-750 text-xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 font-semibold text-cream-900 dark:text-cream-100">
@@ -512,5 +540,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </div>
       </form>
     </Modal>
+    <InstallPwaModal
+      isOpen={installModalOpen}
+      onClose={() => setInstallModalOpen(false)}
+    />
+    </>
   );
 };

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Avatar } from './Avatar';
+import { InstallPwaModal } from './InstallPwaModal';
 import {
   Home,
   MessageCircle,
@@ -12,6 +13,7 @@ import {
   Moon,
   Heart,
   Settings,
+  Smartphone,
 } from 'lucide-react';
 
 export type ActiveTab = 'dashboard' | 'chat' | 'memories' | 'notes' | 'activities';
@@ -29,6 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { profile, partnerProfile, isPartnerOnline, updateProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [installModalOpen, setInstallModalOpen] = useState(false);
 
   const handleToggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
@@ -118,6 +121,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
+            {/* Add to Home Screen / Install Button */}
+            <button
+              onClick={() => setInstallModalOpen(true)}
+              className="p-2 rounded-full text-cream-600 dark:text-cream-300 hover:bg-cream-200/60 dark:hover:bg-cozydark-800 transition-colors active:scale-95"
+              aria-label="Add to Home Screen"
+              title="Add to Home Screen 📱"
+            >
+              <Smartphone className="w-4 h-4 text-blush-500 dark:text-blush-400" />
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={handleToggleTheme}
@@ -174,6 +187,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           );
         })}
       </nav>
+
+      {/* Install PWA Modal */}
+      <InstallPwaModal
+        isOpen={installModalOpen}
+        onClose={() => setInstallModalOpen(false)}
+      />
     </>
   );
 };
