@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
-  const { switchDemoUser } = useAuth();
+  const { switchDemoUser, isMockMode, isSchemaReady } = useAuth();
   const { theme, setThemePreference } = useTheme();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
@@ -102,6 +102,21 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Content */}
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-16 text-center flex-1 flex flex-col justify-center items-center">
+        {/* Notice if Supabase is connected but schema not yet executed */}
+        {!isMockMode && !isSchemaReady && (
+          <div className="w-full max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-3 shadow-sm animate-slide-up">
+            <Sparkles className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="text-left flex-1">
+              <p className="font-semibold mb-1">
+                Connected to Supabase! Initialize Database Tables
+              </p>
+              <p className="opacity-90 leading-relaxed">
+                Your Supabase project (<code className="bg-amber-200/60 dark:bg-amber-900/80 px-1 py-0.5 rounded text-[11px]">vxsushxqhqpjwayadqyj</code>) is connected. In your Supabase Dashboard, open <strong>SQL Editor</strong> and execute <code className="bg-amber-200/60 dark:bg-amber-900/80 px-1 py-0.5 rounded text-[11px]">supabase/schema.sql</code> to create all tables and RLS security policies.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Subtle pill badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blush-100/70 dark:bg-blush-950/60 border border-blush-200/80 dark:border-blush-800/80 text-blush-700 dark:text-blush-300 text-xs font-medium mb-6 animate-fade-in shadow-sm">
           <Heart className="w-3.5 h-3.5 fill-blush-400 text-blush-400 animate-pulse-subtle" />

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, checkDatabaseSchemaReady } from '../lib/supabase';
 import { UserProfile, AuthorizedMember } from '../types/database';
 import { MOCK_USER_AZAN, MOCK_USER_SANA, MOCK_AUTHORIZED_MEMBERS } from '../lib/mockData';
 
@@ -13,6 +13,9 @@ interface AuthContextType {
   isApproved: boolean;
   isLoading: boolean;
   isMockMode: boolean;
+  isSchemaReady: boolean;
+  schemaError: string | null;
+  checkSchema: () => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null; needsApproval?: boolean }>;
   signOut: () => Promise<void>;
@@ -31,6 +34,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authorizedMember, setAuthorizedMember] = useState<AuthorizedMember | null>(null);
   const [isApproved, setIsApproved] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSchemaReady, setIsSchemaReady] = useState<boolean>(true);
+  const [schemaError, setSchemaError] = useState<string | null>(null);
   
   // Track whether we are running in mock demo mode
   const [isMockMode, setIsMockMode] = useState<boolean>(!isSupabaseConfigured());
@@ -122,6 +127,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const checkSchema = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      setIsSchemaReady(true);
+      setSchemaError(null);
+      return true;
+    }
+    const res = await checkDatabaseSchemaReady();
+    setIsSchemaReady(res.ready);
+    setSchemaError(res.ready ? null : res.error || 'Database tables not found');
+    return res.ready;
+  }, []);
+
   // Setup Supabase or Mock initialization
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -134,6 +151,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Running in Real Supabase Mode
     setIsMockMode(false);
+    checkSchema();
+
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
@@ -371,6 +390,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isApproved,
         isLoading,
         isMockMode,
+        isSchemaReady,
+        schemaError,
+        checkSchema,
         signIn,
         signUp,
         signOut,

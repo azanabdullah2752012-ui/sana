@@ -15,7 +15,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   initialMode = 'signin',
 }) => {
-  const { signIn, signUp, resetPassword, isMockMode } = useAuth();
+  const { signIn, signUp, resetPassword, isMockMode, isSchemaReady } = useAuth();
   const { showToast } = useToast();
 
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(initialMode);
@@ -26,6 +26,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isMockMode && !isSchemaReady) {
+      showToast('Please run supabase/schema.sql in your Supabase SQL Editor first!', 'error');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -87,6 +91,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+        {!isMockMode && !isSchemaReady && (
+          <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
+            ⚠️ <strong>Database Setup Required:</strong> Please run <code className="bg-amber-200/60 dark:bg-amber-900 px-1 py-0.5 rounded text-[11px]">supabase/schema.sql</code> in your Supabase SQL Editor to initialize tables.
+          </div>
+        )}
         {mode === 'signup' && (
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 mb-1.5">

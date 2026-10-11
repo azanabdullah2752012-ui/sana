@@ -15,7 +15,7 @@ export const isSupabaseConfigured = (): boolean => {
   }
 };
 
-// Fallback dummy client if credentials aren't provided yet so code doesn't crash on load
+// Fallback client
 export const supabase = createClient(
   isSupabaseConfigured() ? supabaseUrl : 'https://dummy-placeholder.supabase.co',
   isSupabaseConfigured() ? supabaseAnonKey : 'dummy-key',
@@ -33,3 +33,20 @@ export const supabase = createClient(
     },
   }
 );
+
+// Helper to check if tables have been deployed to Supabase
+export const checkDatabaseSchemaReady = async (): Promise<{ ready: boolean; error?: string }> => {
+  if (!isSupabaseConfigured()) return { ready: false, error: 'Not configured' };
+  try {
+    const { error } = await supabase.from('authorized_members').select('id').limit(1);
+    if (error) {
+      if (error.code === 'PGRST205' || error.message?.includes('Could not find the table')) {
+        return { ready: false, error: 'Tables not found. Please run supabase/schema.sql in Supabase SQL Editor.' };
+      }
+      return { ready: false, error: error.message };
+    }
+    return { ready: true };
+  } catch (err: any) {
+    return { ready: false, error: err.message };
+  }
+};
