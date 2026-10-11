@@ -2,16 +2,22 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Message } from '../types/database';
+import { encodeImageMessage } from '../lib/images';
+import { encodeAudioMessage } from '../lib/audio';
 
 export function useChat() {
-  const { user, profile, isApproved } = useAuth();
+  const { user, profile, partnerProfile, isApproved } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isPartnerTyping, setIsPartnerTyping] = useState<boolean>(false);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const initialFetchDone = useRef<boolean>(false);
+  const typingTimeoutRef = useRef<number | null>(null);
+  const realtimeChannelRef = useRef<any>(null);
 
   // Auto-scroll to bottom of conversation
   const scrollToBottom = useCallback((smooth = true) => {
@@ -85,17 +91,20 @@ export function useChat() {
     fetchMessages(true);
   }, [fetchMessages]);
 
-  // Setup Realtime Listener - silent background refresh
+  // Setup Realtime Listener - silent background refresh & typing broadcast
   useEffect(() => {
     if (!isApproved) return;
 
     const channel = supabase
-      .channel('messages_realtime_channel')
+      .channel('messages_realtime_channel', {
+        config: {
+          broadcast: { self: false },
+        },
+      })
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'messages' },
         () => {
-          // Silent refresh: does NOT trigger full loading state or component reload!
           fetchMessages(false);
         }
       )
@@ -106,12 +115,56 @@ export function useChat() {
           fetchMessages(false);
         }
       )
+      // WhatsApp-style typing indicator broadcast
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload && payload.userId && payload.userId !== user?.id) {
+          const isTyping = Boolean(payload.isTyping);
+          setIsPartnerTyping(isTyping);
+
+          // Clear any active timeout
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+          }
+
+          // If partner is typing, automatically clear after 3.5 seconds of silence
+          if (isTyping) {
+            typingTimeoutRef.current = window.setTimeout(() => {
+              setIsPartnerTyping(false);
+            }, 3500);
+          }
+        }
+      })
       .subscribe();
 
+    realtimeChannelRef.current = channel;
+
     return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       supabase.removeChannel(channel);
+      realtimeChannelRef.current = null;
     };
-  }, [isApproved, fetchMessages]);
+  }, [isApproved, fetchMessages, user?.id]);
+
+  // Broadcast typing signal to partner
+  const sendTypingSignal = useCallback(
+    (isTyping: boolean) => {
+      if (!user || !realtimeChannelRef.current) return;
+      try {
+        realtimeChannelRef.current.send({
+          type: 'broadcast',
+          event: 'typing',
+          payload: {
+            userId: user.id,
+            displayName: profile?.display_name || 'Bestie',
+            isTyping,
+          },
+        });
+      } catch (err) {
+        // Non-critical realtime signal
+      }
+    },
+    [user, profile?.display_name]
+  );
 
   // Send a new message with instant optimistic UI update (0ms lag, no reload)
   const sendMessage = async (content: string) => {
@@ -119,6 +172,9 @@ export function useChat() {
 
     const trimmed = content.trim();
     const tempId = `temp-${Date.now()}`;
+
+    // Clear typing state immediately when sending
+    sendTypingSignal(false);
 
     // 1. Optimistic message added to local state immediately
     const optimisticMessage: Message = {
@@ -166,11 +222,24 @@ export function useChat() {
     }
   };
 
+  // Send screenshot or photo message
+  const sendImageMessage = async (imageDataUrl: string, caption?: string) => {
+    if (!imageDataUrl) return;
+    const encoded = encodeImageMessage(imageDataUrl, caption);
+    await sendMessage(encoded);
+  };
+
+  // Send voice note message
+  const sendVoiceNote = async (audioDataUrl: string, durationSec: number) => {
+    if (!audioDataUrl) return;
+    const encoded = encodeAudioMessage(audioDataUrl, durationSec);
+    await sendMessage(encoded);
+  };
+
   // Edit an existing message
   const editMessage = async (messageId: string, newContent: string) => {
     if (!newContent.trim() || !user) return;
 
-    // Optimistically update message in state
     setMessages((prev) =>
       prev.map((m) =>
         m.id === messageId
@@ -204,7 +273,6 @@ export function useChat() {
   const deleteMessage = async (messageId: string) => {
     if (!user) return;
 
-    // Optimistically remove from state
     setMessages((prev) => prev.filter((m) => m.id !== messageId));
 
     try {
@@ -245,7 +313,6 @@ export function useChat() {
           emoji,
         });
       }
-      // Silent refresh
       await fetchMessages(false);
     } catch (err: any) {
       console.error('Failed to toggle reaction:', err);
@@ -260,7 +327,11 @@ export function useChat() {
     setReplyingTo,
     editingMessage,
     setEditingMessage,
+    isPartnerTyping,
+    sendTypingSignal,
     sendMessage,
+    sendImageMessage,
+    sendVoiceNote,
     editMessage,
     deleteMessage,
     toggleReaction,

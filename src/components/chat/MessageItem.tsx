@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Message } from '../../types/database';
 import { Avatar } from '../common/Avatar';
-import { Reply, Edit2, Trash2, Smile, Check, X, Film, Sparkles, Maximize2 } from 'lucide-react';
+import { Reply, Edit2, Trash2, Smile, Check, X, Maximize2, Download, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseStickerMessage } from '../../lib/stickers';
 import { parseGifMessage } from '../../lib/gifs';
+import { parseImageMessage } from '../../lib/images';
+import { parseAudioMessage } from '../../lib/audio';
+import { AudioMessageBubble } from './AudioMessageBubble';
+import { EmojiPickerModal } from './EmojiPickerModal';
 
 interface MessageItemProps {
   message: Message;
@@ -16,7 +20,7 @@ interface MessageItemProps {
   currentUserId: string;
 }
 
-const COMMON_EMOJIS = ['🌸', '💖', '☕', '🍰', '✨', '🥺', '🫂', '😂'];
+const COMMON_EMOJIS = ['🌸', '💖', '☕', '🍰', '✨', '🥺', '🫂', '😂', '🥰', '🔥'];
 
 export const MessageItem: React.FC<MessageItemProps> = ({
   message,
@@ -28,12 +32,16 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   currentUserId,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [fullEmojiModalOpen, setFullEmojiModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
   const [gifLightboxOpen, setGifLightboxOpen] = useState(false);
+  const [imageLightboxOpen, setImageLightboxOpen] = useState(false);
 
   const stickerInfo = parseStickerMessage(message.content);
   const gifInfo = parseGifMessage(message.content);
+  const imageInfo = parseImageMessage(message.content);
+  const audioInfo = parseAudioMessage(message.content);
 
   const formatMessageTime = (dateStr: string) => {
     try {
@@ -51,6 +59,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   };
 
   const getReplyPreviewText = (content: string) => {
+    const img = parseImageMessage(content);
+    if (img.isImage) return `📷 Photo ${img.caption ? `: ${img.caption}` : ''}`;
+    const aud = parseAudioMessage(content);
+    if (aud.isAudio) return '🎤 Voice message';
     const s = parseStickerMessage(content);
     if (s.isSticker) return `🏷️ Sticker: ${s.name || 'Custom'}`;
     const g = parseGifMessage(content);
@@ -71,7 +83,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
   return (
     <div
-      className={`group relative flex gap-2.5 sm:gap-3 my-2.5 px-1 sm:px-4 ${
+      className={`group relative flex gap-2.5 sm:gap-3 my-2 px-1 sm:px-3 ${
         isMe ? 'flex-row-reverse' : 'flex-row'
       }`}
     >
@@ -86,15 +98,23 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       {/* Message Bubble Container */}
       <div className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
         
-        {/* Sender Name & Time */}
-        <div className="flex items-center gap-2 mb-1 px-1">
+        {/* Sender Name & Time & WhatsApp-Style Double Checkmarks */}
+        <div className="flex items-center gap-1.5 mb-1 px-1">
           <span className="text-xs font-medium text-cream-600 dark:text-cream-400">
             {message.sender?.display_name || (isMe ? 'Me' : 'Bestie')}
           </span>
           <span className="text-[10px] text-cream-400 dark:text-cream-500">
             {formatMessageTime(message.created_at)}
           </span>
-          {message.is_edited && !stickerInfo.isSticker && !gifInfo.isGif && (
+          {isMe && (
+            <span
+              className="text-blush-500 dark:text-blush-400 font-bold text-[11px] tracking-tighter"
+              title={message.id.startsWith('temp-') ? 'Sending...' : 'Delivered & Seen'}
+            >
+              {message.id.startsWith('temp-') ? '⏱️' : '✓✓'}
+            </span>
+          )}
+          {message.is_edited && !stickerInfo.isSticker && !gifInfo.isGif && !imageInfo.isImage && !audioInfo.isAudio && (
             <span className="text-[10px] italic text-cream-400 dark:text-cream-500">
               (edited)
             </span>
@@ -142,6 +162,45 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 </button>
               </div>
             </div>
+          ) : imageInfo.isImage && imageInfo.imageUrl ? (
+            /* Screenshot / Photo Rendering */
+            <div className="flex flex-col gap-1 max-w-[280px] sm:max-w-[360px]">
+              <div
+                onClick={() => setImageLightboxOpen(true)}
+                className="group/img relative rounded-2.5xl overflow-hidden shadow-cozy border border-cream-200/80 dark:border-cozydark-700 bg-cream-100/50 dark:bg-cozydark-850 cursor-pointer hover:border-blush-400 dark:hover:border-blush-600 transition-all active:scale-[0.99]"
+                title="Click to view full screenshot"
+              >
+                <img
+                  src={imageInfo.imageUrl}
+                  alt={imageInfo.caption || 'Screenshot'}
+                  className="w-full h-auto max-h-80 object-cover rounded-2.5xl"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="p-2.5 rounded-full bg-black/60 text-white backdrop-blur-xs">
+                    <Maximize2 className="w-4 h-4" />
+                  </span>
+                </div>
+              </div>
+              {imageInfo.caption && (
+                <div
+                  className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-xs ${
+                    isMe
+                      ? 'bg-gradient-to-br from-blush-200 via-blush-100 to-blush-200/90 text-blush-950 border border-blush-300/60 dark:from-blush-900/80 dark:via-blush-800/70 dark:to-blush-900/80 dark:text-cream-50'
+                      : 'bg-white dark:bg-cozydark-800 border border-cream-200/80 dark:border-cozydark-700 text-cream-900 dark:text-cream-50'
+                  }`}
+                >
+                  {imageInfo.caption}
+                </div>
+              )}
+            </div>
+          ) : audioInfo.isAudio && audioInfo.audioUrl ? (
+            /* Voice Note Audio Rendering */
+            <AudioMessageBubble
+              audioUrl={audioInfo.audioUrl}
+              durationSec={audioInfo.durationSec || 0}
+              isMe={isMe}
+            />
           ) : stickerInfo.isSticker ? (
             /* Custom / Preset Sticker Rendering */
             <div className="group/sticker relative inline-block p-1">
@@ -222,7 +281,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               {/* Edit (only text) & Delete for author */}
               {isMe && (
                 <>
-                  {!stickerInfo.isSticker && !gifInfo.isGif && (
+                  {!stickerInfo.isSticker && !gifInfo.isGif && !imageInfo.isImage && !audioInfo.isAudio && (
                     <button
                       onClick={() => {
                         setEditContent(message.content);
@@ -246,10 +305,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             </div>
           )}
 
-          {/* Quick Floating Emoji Popover */}
+          {/* Quick Floating Emoji Popover + More Emojis (+) */}
           {showEmojiPicker && (
             <div
-              className={`absolute bottom-full mb-2 z-20 flex gap-1 p-1.5 rounded-full bg-cream-50 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 shadow-cozy-lg ${
+              className={`absolute bottom-full mb-2 z-20 flex items-center gap-1 p-1.5 rounded-full bg-cream-50 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 shadow-cozy-lg animate-fade-in ${
                 isMe ? 'right-0' : 'left-0'
               }`}
             >
@@ -265,6 +324,16 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                   {emoji}
                 </button>
               ))}
+              <button
+                onClick={() => {
+                  setShowEmojiPicker(false);
+                  setFullEmojiModalOpen(true);
+                }}
+                className="w-7 h-7 flex items-center justify-center rounded-full bg-cream-200/70 dark:bg-cozydark-750 text-cream-600 dark:text-cream-300 hover:bg-blush-100 hover:text-blush-600 dark:hover:bg-blush-950/60 transition-transform hover:scale-110 text-xs font-bold"
+                title="Browse all emojis"
+              >
+                +
+              </button>
             </div>
           )}
         </div>
@@ -293,6 +362,52 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         )}
       </div>
+
+      {/* Full Emoji Picker Modal for reaction */}
+      <EmojiPickerModal
+        isOpen={fullEmojiModalOpen}
+        onClose={() => setFullEmojiModalOpen(false)}
+        onSelectEmoji={(emoji) => onToggleReaction(message.id, emoji)}
+        title="Add Emoji Reaction"
+      />
+
+      {/* Fullscreen Screenshot/Image Lightbox */}
+      {imageLightboxOpen && imageInfo.imageUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setImageLightboxOpen(false)}
+        >
+          <div className="absolute top-5 right-5 flex items-center gap-2">
+            <a
+              href={imageInfo.imageUrl}
+              download="sanctuary-screenshot.jpg"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+              title="Download image"
+            >
+              <Download className="w-5 h-5" />
+            </a>
+            <button
+              onClick={() => setImageLightboxOpen(false)}
+              className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="max-w-4xl max-h-[90vh] flex flex-col items-center">
+            <img
+              src={imageInfo.imageUrl}
+              alt="Screenshot Fullview"
+              className="max-h-[80vh] w-auto rounded-2xl shadow-2xl object-contain border border-white/10"
+            />
+            {imageInfo.caption && (
+              <p className="text-white/90 text-sm mt-3 px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-sm">
+                {imageInfo.caption}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* KLIPY GIF Fullscreen Lightbox */}
       {gifLightboxOpen && gifInfo.url && (
