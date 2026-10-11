@@ -1,211 +1,153 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { KindnessPointEntry, KindnessCategory } from '../types/database';
-import { BASE_USER_AZAN, BASE_USER_SANA } from '../lib/mockData';
+import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'sana_kindness_points';
-const EVENT_NAME = 'sana_kindness_updated';
+const STORAGE_KEY = 'sana_bestie_simple_points';
+const EVENT_NAME = 'sana_simple_points_updated';
 
-// Warm, cute initial deeds if fresh installation
-const INITIAL_DEEDS: KindnessPointEntry[] = [
-  {
-    id: 'pt-init-1',
-    recipient_id: BASE_USER_SANA.id,
-    giver_id: BASE_USER_AZAN.id,
-    points: 1,
-    reason: 'Built this whole private sanctuary for us 🌸✨',
-    category: 'thoughtful',
-    created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'pt-init-2',
-    recipient_id: BASE_USER_AZAN.id,
-    giver_id: BASE_USER_SANA.id,
-    points: 1,
-    reason: 'Sent the funniest reels & laughed uncontrollably 😂',
-    category: 'laughter',
-    created_at: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'pt-init-3',
-    recipient_id: BASE_USER_SANA.id,
-    giver_id: BASE_USER_AZAN.id,
-    points: 1,
-    reason: 'Listened and cheered me up when tired 🫂',
-    category: 'support',
-    created_at: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'pt-init-4',
-    recipient_id: BASE_USER_AZAN.id,
-    giver_id: BASE_USER_SANA.id,
-    points: 1,
-    reason: 'Surprise treat & coffee reminder ☕',
-    category: 'treat',
-    created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-  },
-];
+export interface PointActivity {
+  id: string;
+  person: 'azan' | 'sana';
+  delta: number;
+  note?: string;
+  timestamp: string;
+}
 
-function getStoredEntries(): KindnessPointEntry[] {
+export interface BestiePointsState {
+  azan: number;
+  sana: number;
+  activities: PointActivity[];
+}
+
+const DEFAULT_STATE: BestiePointsState = {
+  azan: 5,
+  sana: 5,
+  activities: [
+    {
+      id: 'act-1',
+      person: 'sana',
+      delta: 1,
+      note: 'Shared cute reels & made me laugh 😂',
+      timestamp: new Date(Date.now() - 3600 * 1000 * 3).toISOString(),
+    },
+    {
+      id: 'act-2',
+      person: 'azan',
+      delta: 1,
+      note: 'Built our sanctuary app 🌸',
+      timestamp: new Date(Date.now() - 3600 * 1000 * 12).toISOString(),
+    },
+  ],
+};
+
+function getStored(): BestiePointsState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (typeof parsed.azan === 'number' && typeof parsed.sana === 'number') {
+        return parsed;
+      }
     }
   } catch (e) {
-    console.warn('Error reading kindness points from storage:', e);
+    console.warn(e);
   }
-  return INITIAL_DEEDS;
+  return DEFAULT_STATE;
 }
 
-function saveStoredEntries(entries: KindnessPointEntry[]) {
+function persist(state: BestiePointsState) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: entries }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: state }));
   } catch (e) {
-    console.warn('Error saving kindness points to storage:', e);
+    console.warn(e);
   }
 }
 
 export function useKindnessPoints() {
-  const [entries, setEntries] = useState<KindnessPointEntry[]>(getStoredEntries);
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState<BestiePointsState>(getStored);
 
-  // Sync with Supabase on mount
   useEffect(() => {
-    let channel: any = null;
-
-    const fetchSupabaseEntries = async () => {
-      if (!isSupabaseConfigured()) return;
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('kindness_points')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (!error && data && data.length > 0) {
-          setEntries(data as KindnessPointEntry[]);
-          saveStoredEntries(data as KindnessPointEntry[]);
-        }
-      } catch (err) {
-        // Table may not exist yet, fallback to localStorage cleanly
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSupabaseEntries();
-
-    // Listen for local updates across tabs
-    const handleLocalUpdate = (e: any) => {
+    const handler = (e: any) => {
       if (e.detail) {
-        setEntries(e.detail);
+        setState(e.detail);
       } else {
-        setEntries(getStoredEntries());
+        setState(getStored());
       }
     };
-
-    window.addEventListener(EVENT_NAME, handleLocalUpdate);
-
-    // Setup Supabase Realtime subscription
-    if (isSupabaseConfigured()) {
-      try {
-        channel = supabase
-          .channel('public:kindness_points')
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'kindness_points' },
-            () => {
-              fetchSupabaseEntries();
-            }
-          )
-          .subscribe();
-      } catch (e) {
-        console.warn('Realtime kindness subscription warning:', e);
-      }
-    }
-
-    return () => {
-      window.removeEventListener(EVENT_NAME, handleLocalUpdate);
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
-    };
+    window.addEventListener(EVENT_NAME, handler);
+    return () => window.removeEventListener(EVENT_NAME, handler);
   }, []);
 
-  // Compute points
-  const azanPoints = useMemo(() => {
-    return entries
-      .filter((e) => e.recipient_id === BASE_USER_AZAN.id)
-      .reduce((sum, e) => sum + (Number(e.points) || 1), 0);
-  }, [entries]);
-
-  const sanaPoints = useMemo(() => {
-    return entries
-      .filter((e) => e.recipient_id === BASE_USER_SANA.id)
-      .reduce((sum, e) => sum + (Number(e.points) || 1), 0);
-  }, [entries]);
-
-  const awardPoints = useCallback(
-    async (
-      recipientId: string,
-      giverId: string,
-      points: number,
-      reason: string,
-      category: KindnessCategory
-    ) => {
-      const newEntry: KindnessPointEntry = {
-        id: `pt-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-        recipient_id: recipientId,
-        giver_id: giverId,
-        points: Math.max(1, points),
-        reason: reason.trim(),
-        category,
-        created_at: new Date().toISOString(),
+  const addPoint = useCallback((person: 'azan' | 'sana', note = '') => {
+    setState((prev) => {
+      const next: BestiePointsState = {
+        ...prev,
+        [person]: prev[person] + 1,
+        activities: [
+          {
+            id: `act-${Date.now()}`,
+            person,
+            delta: 1,
+            note: note.trim() || undefined,
+            timestamp: new Date().toISOString(),
+          },
+          ...prev.activities.slice(0, 19), // keep last 20
+        ],
       };
+      persist(next);
+      return next;
+    });
+  }, []);
 
-      const updated = [newEntry, ...entries];
-      setEntries(updated);
-      saveStoredEntries(updated);
+  const subtractPoint = useCallback((person: 'azan' | 'sana') => {
+    setState((prev) => {
+      const next: BestiePointsState = {
+        ...prev,
+        [person]: Math.max(0, prev[person] - 1),
+        activities: [
+          {
+            id: `act-${Date.now()}`,
+            person,
+            delta: -1,
+            note: 'Point adjusted',
+            timestamp: new Date().toISOString(),
+          },
+          ...prev.activities.slice(0, 19),
+        ],
+      };
+      persist(next);
+      return next;
+    });
+  }, []);
 
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('kindness_points').insert([newEntry]);
-        } catch (e) {
-          console.warn('Supabase kindness point sync warning:', e);
-        }
-      }
-      return newEntry;
-    },
-    [entries]
-  );
+  const deleteActivity = useCallback((id: string) => {
+    setState((prev) => {
+      const next: BestiePointsState = {
+        ...prev,
+        activities: prev.activities.filter((a) => a.id !== id),
+      };
+      persist(next);
+      return next;
+    });
+  }, []);
 
-  const deleteEntry = useCallback(
-    async (id: string) => {
-      const updated = entries.filter((e) => e.id !== id);
-      setEntries(updated);
-      saveStoredEntries(updated);
-
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('kindness_points').delete().eq('id', id);
-        } catch (e) {
-          console.warn('Supabase delete kindness warning:', e);
-        }
-      }
-    },
-    [entries]
-  );
+  const resetScores = useCallback(() => {
+    const next: BestiePointsState = {
+      azan: 0,
+      sana: 0,
+      activities: [],
+    };
+    setState(next);
+    persist(next);
+  }, []);
 
   return {
-    entries,
-    loading,
-    azanPoints,
-    sanaPoints,
-    totalKindnesses: entries.length,
-    awardPoints,
-    deleteEntry,
+    azanPoints: state.azan,
+    sanaPoints: state.sana,
+    totalKindnesses: state.activities.length,
+    activities: state.activities,
+    addPoint,
+    subtractPoint,
+    deleteActivity,
+    resetScores,
   };
 }

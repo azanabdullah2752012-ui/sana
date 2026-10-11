@@ -6,6 +6,7 @@ import { useSpecialDates } from '../../hooks/useSpecialDates';
 import { useDailyPrompt } from '../../hooks/useDailyPrompt';
 import { useKindnessPoints } from '../../hooks/useKindnessPoints';
 import { Avatar } from '../common/Avatar';
+import { useToast } from '../common/Toast';
 import { ActiveTab } from '../common/Navbar';
 import { QuestionGeneratorModal } from '../activities/QuestionGeneratorModal';
 import {
@@ -36,7 +37,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const { notes } = useNotes();
   const { dates, getDaysUntil } = useSpecialDates();
   const { prompt, myAnswer, partnerAnswer } = useDailyPrompt();
-  const { azanPoints, sanaPoints, totalKindnesses } = useKindnessPoints();
+  const { azanPoints, sanaPoints, totalKindnesses, addPoint } = useKindnessPoints();
+  const { showToast } = useToast();
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
 
   const getGreetingTime = () => {
@@ -272,11 +274,31 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setActiveTab('activities')}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/10 to-blush-500/10 hover:from-amber-500/20 hover:to-blush-500/20 text-cream-800 dark:text-cream-200 text-xs font-medium border border-amber-200/80 dark:border-cozydark-700 transition-colors flex items-center gap-1.5"
+            onClick={() => {
+              addPoint('azan');
+              showToast('+1 Point for Azan! ⭐', 'success');
+            }}
+            className="px-2.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 text-xs font-bold transition-all active:scale-95"
+            title="Give Azan a point"
           >
-            <span>Open Points Tracker</span>
-            <ArrowRight className="w-3.5 h-3.5 text-blush-500" />
+            +1 Azan ☕
+          </button>
+          <button
+            onClick={() => {
+              addPoint('sana');
+              showToast('+1 Point for Sana! 🌸', 'success');
+            }}
+            className="px-2.5 py-1.5 rounded-xl bg-blush-100 hover:bg-blush-200 dark:bg-blush-950/80 text-blush-800 dark:text-blush-200 text-xs font-bold transition-all active:scale-95"
+            title="Give Sana a point"
+          >
+            +1 Sana 🌸
+          </button>
+          <button
+            onClick={() => setActiveTab('activities')}
+            className="p-1.5 rounded-xl text-cream-400 hover:text-cream-600 dark:hover:text-cream-200 transition-colors"
+            title="Open Points Tracker"
+          >
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
