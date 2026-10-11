@@ -33,6 +33,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const PROFILE_CACHE_KEY_PREFIX = 'sana_profile_cache_';
+
+function getCachedProfile(userId: string): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY_PREFIX + userId);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+
+function setCachedProfile(userId: string, prof: UserProfile) {
+  try {
+    localStorage.setItem(PROFILE_CACHE_KEY_PREFIX + userId, JSON.stringify(prof));
+  } catch {}
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { setThemePreference, setAccentColor } = useTheme();
 
@@ -63,19 +79,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const partnerBase = isAzan ? BASE_USER_SANA : BASE_USER_AZAN;
     const authRecord = isAzan ? BASE_AUTHORIZED_MEMBERS[0] : BASE_AUTHORIZED_MEMBERS[1];
 
+    // 1. Immediately hydrate from local persistent cache (0ms delay, no reset!)
+    const cachedUser = getCachedProfile(currentBase.id);
+    const cachedPartner = getCachedProfile(partnerBase.id);
+
+    const initialProfile: UserProfile = cachedUser || currentBase;
+    const initialPartner: UserProfile = cachedPartner || partnerBase;
+
     const authUser: AuthUser = {
       id: currentBase.id,
-      display_name: currentBase.display_name,
+      display_name: initialProfile.display_name || currentBase.display_name,
       role,
     };
 
     setUser(authUser);
+    setProfile(initialProfile);
+    setPartnerProfile(initialPartner);
     setAuthorizedMember(authRecord);
     setIsApproved(true);
 
+    if (initialProfile.theme_preference) {
+      setThemePreference(initialProfile.theme_preference);
+    }
+    if (initialProfile.accent_color) {
+      setAccentColor(initialProfile.accent_color);
+    }
+
+    // 2. Fetch latest live profile from Supabase and synchronize
     if (isSupabaseConfigured()) {
       try {
-        // Fetch current user profile from Supabase
         const { data: dbProfile } = await supabase
           .from('profiles')
           .select('*')
@@ -84,16 +116,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (dbProfile) {
           const loaded = dbProfile as UserProfile;
-          setProfile(loaded);
-          // Sync stored preferences directly into ThemeContext and DOM
-          if (loaded.theme_preference) {
-            setThemePreference(loaded.theme_preference);
+          // Merge safely: preserve local custom avatar/bio if Supabase returned empty/null
+          const resolvedAvatar = loaded.avatar_url ?? cachedUser?.avatar_url ?? null;
+          const resolvedBio = loaded.bio !== undefined && loaded.bio !== null && loaded.bio !== ''
+            ? loaded.bio
+            : (cachedUser?.bio || '');
+
+          const merged: UserProfile = {
+            ...loaded,
+            avatar_url: resolvedAvatar,
+            bio: resolvedBio,
+          };
+
+          setProfile(merged);
+          setCachedProfile(currentBase.id, merged);
+
+          // If local has custom avatar but DB was empty, sync it up to DB
+          if (!loaded.avatar_url && cachedUser?.avatar_url) {
+            supabase
+              .from('profiles')
+              .update({ avatar_url: cachedUser.avatar_url })
+              .eq('id', currentBase.id)
+              .then(() => {});
           }
-          if (loaded.accent_color) {
-            setAccentColor(loaded.accent_color);
+
+          if (merged.theme_preference) {
+            setThemePreference(merged.theme_preference);
           }
-        } else {
-          setProfile(currentBase);
+          if (merged.accent_color) {
+            setAccentColor(merged.accent_color);
+          }
         }
 
         // Fetch partner profile from Supabase
@@ -104,17 +156,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .maybeSingle();
 
         if (dbPartner) {
-          setPartnerProfile(dbPartner as UserProfile);
-        } else {
-          setPartnerProfile(partnerBase);
+          const loadedPartner = dbPartner as UserProfile;
+          const mergedPartner: UserProfile = {
+            ...loadedPartner,
+            avatar_url: loadedPartner.avatar_url ?? cachedPartner?.avatar_url ?? null,
+            bio: loadedPartner.bio ?? cachedPartner?.bio ?? '',
+          };
+          setPartnerProfile(mergedPartner);
+          setCachedProfile(partnerBase.id, mergedPartner);
         }
       } catch (e) {
-        setProfile(currentBase);
-        setPartnerProfile(partnerBase);
+        console.warn('Profile fetch warning:', e);
       }
-    } else {
-      setProfile(currentBase);
-      setPartnerProfile(partnerBase);
     }
   }, [setThemePreference, setAccentColor]);
 
@@ -207,6 +260,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setProfile(updated);
+    setCachedProfile(profile.id, updated);
 
     if (isSupabaseConfigured()) {
       try {

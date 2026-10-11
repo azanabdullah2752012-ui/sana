@@ -4,7 +4,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Modal } from '../common/Modal';
 import { Avatar } from '../common/Avatar';
 import { useToast } from '../common/Toast';
-import { uploadMemoryImage } from '../../lib/storage';
+import { uploadMemoryImage, optimizeAvatarImage } from '../../lib/storage';
 import { ThemePreference, AccentColor } from '../../types/database';
 import { getKlipyApiKey, setKlipyApiKey } from '../../lib/gifs';
 import {
@@ -53,34 +53,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [klipyApiKeyInput, setKlipyApiKeyInput] = useState(() => getKlipyApiKey());
 
   useEffect(() => {
-    if (profile) {
-      setDisplayName(profile.display_name || '');
-      setBio(profile.bio || '');
-      setAvatarUrl(profile.avatar_url || null);
+    if (isOpen) {
+      setDisplayName(profile?.display_name || '');
+      setBio(profile?.bio || '');
+      setAvatarUrl(profile?.avatar_url || null);
       setKlipyApiKeyInput(getKlipyApiKey());
     }
-  }, [profile, isOpen]);
+  }, [isOpen, profile]);
 
   const handleAvatarFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('Image size must be under 10MB', 'error');
+    if (file.size > 25 * 1024 * 1024) {
+      showToast('Image size must be under 25MB', 'error');
       return;
     }
 
     try {
       setUploadingAvatar(true);
-      showToast('Uploading custom profile photo...', 'info');
-      const url = await uploadMemoryImage(file);
-      setAvatarUrl(url);
-      showToast('Profile photo uploaded! ✨', 'success');
+      showToast('Optimizing and saving photo...', 'info');
+      const optimizedUrl = await optimizeAvatarImage(file);
+      setAvatarUrl(optimizedUrl);
+
+      // Auto-save immediately so reload never resets photo!
+      await updateProfile({ avatar_url: optimizedUrl });
+      showToast('Profile photo updated! ✨', 'success');
     } catch (err: any) {
-      showToast(err.message || 'Failed to upload photo', 'error');
+      showToast(err.message || 'Failed to update photo', 'error');
     } finally {
       setUploadingAvatar(false);
+      e.target.value = '';
     }
+  };
+
+  const handleRemovePhoto = async () => {
+    setAvatarUrl(null);
+    await updateProfile({ avatar_url: null });
+    showToast('Profile photo removed ✨', 'info');
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -179,7 +189,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               {avatarUrl && (
                 <button
                   type="button"
-                  onClick={() => setAvatarUrl(null)}
+                  onClick={handleRemovePhoto}
                   className="ml-2 text-[11px] text-cream-500 hover:text-rose-500 underline"
                 >
                   Remove Photo
@@ -208,13 +218,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
             <div>
               <label className="block text-xs font-medium text-cream-700 dark:text-cream-300 mb-1">
-                Bio / Cozy Note
+                Bio / Personal Note
               </label>
               <input
                 type="text"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="A little note your friend sees..."
+                placeholder="Add a bio or personal note..."
                 className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-xs sm:text-sm text-cream-900 dark:text-cream-50 focus:outline-none focus:ring-2 focus:ring-blush-300"
               />
             </div>

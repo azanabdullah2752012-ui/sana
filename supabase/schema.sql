@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   display_name text NOT NULL,
   passcode text NOT NULL,
   avatar_url text,
-  bio text DEFAULT 'Sharing cozy memories & little moments ☕✨',
+  bio text DEFAULT '',
   theme_preference text DEFAULT 'light' CHECK (theme_preference IN ('light', 'dark', 'system')),
   accent_color text DEFAULT 'blush' CHECK (accent_color IN ('blush', 'lavender', 'cream', 'rose', 'peach', 'mint', 'sky', 'violet')),
   created_at timestamptz DEFAULT now(),
@@ -157,16 +157,16 @@ VALUES
     'user-azan-001', 
     'Azan', 
     'azanisthebest', 
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-    'Coffee lover, photographer, making memories ☕✨',
+    null,
+    '',
     'blush'
   ),
   (
     'user-sana-002', 
     'Sana', 
     'sanaisthebest', 
-    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80',
-    'Bookworm, matcha enthusiast, journaling life 🍵🌸',
+    null,
+    '',
     'lavender'
   )
 ON CONFLICT (id) DO UPDATE SET
@@ -192,13 +192,6 @@ VALUES (
   'cozy reflection'
 )
 ON CONFLICT (prompt_date) DO NOTHING;
-
--- Initial Special Dates (Countdowns)
-INSERT INTO public.special_dates (id, created_by, title, event_date, description, category, is_recurring_yearly)
-VALUES
-  ('date-001', 'user-azan-001', 'Sana''s Birthday 🎂', '2026-11-20', 'Celebrate Sana with her favorite lavender cake and flowers!', 'birthday', true),
-  ('date-002', 'user-sana-002', 'Friendship Anniversary 🌸', '2026-12-14', 'The day we first met and talked about art for 4 hours straight.', 'anniversary', true)
-ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES (With Safe DROP POLICY IF EXISTS)
