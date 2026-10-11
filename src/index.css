@@ -10,12 +10,38 @@
   html {
     scroll-behavior: smooth;
     background-color: #FAF6ED;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   html.dark {
     background-color: #0C0A0E;
     color: #FAF6ED;
   }
+
+  /* Dynamic Theme Atmospheres — Tailored undertones for both light and dark */
+  html[data-accent="blush"] { background-color: #FAF5F2; }
+  html.dark[data-accent="blush"] { background-color: #0E0A0D; }
+
+  html[data-accent="lavender"] { background-color: #F8F6FD; }
+  html.dark[data-accent="lavender"] { background-color: #0C0A14; }
+
+  html[data-accent="rose"] { background-color: #FAF4F5; }
+  html.dark[data-accent="rose"] { background-color: #11090C; }
+
+  html[data-accent="peach"] { background-color: #FAF6F1; }
+  html.dark[data-accent="peach"] { background-color: #120C07; }
+
+  html[data-accent="mint"] { background-color: #F4F9F6; }
+  html.dark[data-accent="mint"] { background-color: #08100C; }
+
+  html[data-accent="sky"] { background-color: #F3F8FB; }
+  html.dark[data-accent="sky"] { background-color: #070D14; }
+
+  html[data-accent="violet"] { background-color: #F8F5FD; }
+  html.dark[data-accent="violet"] { background-color: #0E0715; }
+
+  html[data-accent="cream"] { background-color: #F9F6EE; }
+  html.dark[data-accent="cream"] { background-color: #0F0D0A; }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -26,6 +52,7 @@
     padding: 0;
     min-height: 100vh;
     min-height: 100dvh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4, .font-serif {

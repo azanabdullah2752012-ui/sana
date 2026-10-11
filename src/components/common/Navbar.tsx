@@ -27,11 +27,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   onOpenSettings,
 }) => {
-  const { profile, partnerProfile, isPartnerOnline } = useAuth();
-  const { theme, setThemePreference } = useTheme();
+  const { profile, partnerProfile, isPartnerOnline, updateProfile } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
-  const toggleTheme = () => {
-    setThemePreference(theme === 'dark' ? 'light' : 'dark');
+  const handleToggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    toggleTheme();
+    updateProfile({ theme_preference: next }).catch(() => {});
   };
 
   const navItems = [
@@ -118,11 +120,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Theme Toggle */}
             <button
-              onClick={toggleTheme}
+              onClick={handleToggleTheme}
               className="p-2 rounded-full text-cream-600 dark:text-cream-300 hover:bg-cream-200/60 dark:hover:bg-cozydark-800 transition-colors active:scale-95"
-              aria-label="Toggle theme"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to Light mode ☀️' : 'Switch to Dark mode 🌙'}
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-cream-600 dark:text-cream-300" />}
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300 animate-spin-once" /> : <Moon className="w-4 h-4 text-cream-600 dark:text-cream-300" />}
             </button>
 
             {/* Profile Avatar & Settings trigger */}

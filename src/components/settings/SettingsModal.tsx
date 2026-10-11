@@ -18,6 +18,9 @@ import {
   Check,
   Film,
   Key,
+  Sun,
+  Moon,
+  Monitor,
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -25,15 +28,71 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-const ACCENT_COLORS: { id: AccentColor; label: string; bg: string }[] = [
-  { id: 'blush', label: 'Blush Pink', bg: 'bg-[#F68CAE]' },
-  { id: 'rose', label: 'Dusty Rose', bg: 'bg-[#F43F5E]' },
-  { id: 'lavender', label: 'Lavender', bg: 'bg-[#BA9BF0]' },
-  { id: 'violet', label: 'Royal Violet', bg: 'bg-[#8B5CF6]' },
-  { id: 'cream', label: 'Toasted Cream', bg: 'bg-[#B88E6D]' },
-  { id: 'peach', label: 'Warm Peach', bg: 'bg-[#FB923C]' },
-  { id: 'mint', label: 'Sage Mint', bg: 'bg-[#10B981]' },
-  { id: 'sky', label: 'Soft Sky', bg: 'bg-[#0EA5E9]' },
+interface SanctuaryTheme {
+  id: AccentColor;
+  name: string;
+  subtitle: string;
+  emoji: string;
+  accentBg: string;
+}
+
+const SANCTUARY_THEMES: SanctuaryTheme[] = [
+  {
+    id: 'blush',
+    name: 'Blush Romance',
+    subtitle: 'Soft Rose & Candlelight',
+    emoji: '🌸',
+    accentBg: 'bg-[#F472B6]',
+  },
+  {
+    id: 'violet',
+    name: 'Midnight Velvet',
+    subtitle: 'Amethyst & Starry Obsidian',
+    emoji: '🌙',
+    accentBg: 'bg-[#8B5CF6]',
+  },
+  {
+    id: 'mint',
+    name: 'Matcha & Sage',
+    subtitle: 'Eucalyptus & Organic Moss',
+    emoji: '🌿',
+    accentBg: 'bg-[#10B981]',
+  },
+  {
+    id: 'peach',
+    name: 'Sunset Amber',
+    subtitle: 'Terracotta & Golden Honey',
+    emoji: '🍯',
+    accentBg: 'bg-[#FB923C]',
+  },
+  {
+    id: 'rose',
+    name: 'Bordeaux Wine',
+    subtitle: 'Deep Crimson & Ruby Velvet',
+    emoji: '🍷',
+    accentBg: 'bg-[#F43F5E]',
+  },
+  {
+    id: 'sky',
+    name: 'Nordic Sky',
+    subtitle: 'Arctic Cyan & Frosted Slate',
+    emoji: '❄️',
+    accentBg: 'bg-[#0EA5E9]',
+  },
+  {
+    id: 'cream',
+    name: 'Cozy Mocha',
+    subtitle: 'Warm Cashmere & Roasted Cocoa',
+    emoji: '☕',
+    accentBg: 'bg-[#B88E6D]',
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender Dusk',
+    subtitle: 'Dreamy Lilac & Twilight Mist',
+    emoji: '🔮',
+    accentBg: 'bg-[#BA9BF0]',
+  },
 ];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
@@ -91,6 +150,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setAvatarUrl(null);
     await updateProfile({ avatar_url: null });
     showToast('Profile photo removed ✨', 'info');
+  };
+
+  const handleSelectMode = (mode: ThemePreference) => {
+    setThemePreference(mode);
+    updateProfile({ theme_preference: mode }).catch(() => {});
+  };
+
+  const handleSelectTheme = (themeId: AccentColor) => {
+    setAccentColor(themeId);
+    updateProfile({ accent_color: themeId }).catch(() => {});
+    const themeObj = SANCTUARY_THEMES.find((t) => t.id === themeId);
+    showToast(`Switched to ${themeObj?.name || themeId} ✨`, 'info');
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -231,54 +302,100 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* 2. Theme & Custom Accent Colors */}
+        {/* 2. Theme & Sanctuary Color Atmospheres */}
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 mb-3 flex items-center gap-1.5">
-            <Palette className="w-4 h-4 text-blush-400" />
-            <span>Theme &amp; Accent Palette</span>
-          </h4>
-
-          {/* Light / Dark Mode */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {(['light', 'dark', 'system'] as ThemePreference[]).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => setThemePreference(mode)}
-                className={`py-2 px-3 rounded-2xl text-xs font-medium capitalize border transition-all ${
-                  themePreference === mode
-                    ? 'bg-blush-500 text-white border-blush-500 shadow-sm'
-                    : 'bg-cream-100 dark:bg-cozydark-850 border-cream-200 dark:border-cozydark-800 text-cream-700 dark:text-cream-300'
-                }`}
-              >
-                {mode === 'system' ? 'System ⚙️' : mode === 'light' ? 'Light ☀️' : 'Dark 🌙'}
-              </button>
-            ))}
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 flex items-center gap-1.5">
+              <Palette className="w-4 h-4 text-blush-400" />
+              <span>Theme &amp; Appearance</span>
+            </h4>
+            <span className="text-[11px] text-cream-500 dark:text-cream-400 font-normal">
+              Instant live preview ✨
+            </span>
           </div>
 
-          {/* Extended Accent Palettes */}
-          <div>
-            <label className="block text-xs font-medium text-cream-600 dark:text-cream-400 mb-2">
-              Color Accent:
+          {/* Light / Dark Mode Segmented Switcher */}
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-cream-700 dark:text-cream-300 mb-1.5">
+              Appearance Mode
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {ACCENT_COLORS.map((col) => {
-                const isSelected = accentColor === col.id;
+            <div className="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-cream-200/60 dark:bg-cozydark-850 border border-cream-300/60 dark:border-cozydark-750">
+              {[
+                { id: 'light' as ThemePreference, label: 'Light', icon: Sun },
+                { id: 'dark' as ThemePreference, label: 'Dark', icon: Moon },
+                { id: 'system' as ThemePreference, label: 'System', icon: Monitor },
+              ].map((item) => {
+                const Icon = item.icon;
+                const isSelected = themePreference === item.id;
                 return (
                   <button
-                    key={col.id}
+                    key={item.id}
                     type="button"
-                    onClick={() => setAccentColor(col.id)}
-                    className={`flex items-center gap-2 p-2 rounded-2xl border transition-all ${
+                    onClick={() => handleSelectMode(item.id)}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-medium transition-all ${
                       isSelected
-                        ? 'border-blush-500/80 dark:border-blush-400/80 bg-cream-100 dark:bg-cozydark-800 font-semibold shadow-xs ring-1 ring-blush-400/40'
-                        : 'border-cream-200/80 dark:border-cozydark-800 hover:bg-cream-100/50'
+                        ? 'bg-white dark:bg-cozydark-700 text-cream-950 dark:text-cream-50 shadow-xs font-semibold ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-cream-600 dark:text-cream-400 hover:text-cream-900 dark:hover:text-cream-200'
                     }`}
                   >
-                    <span className={`w-4 h-4 rounded-full ${col.bg} shrink-0 shadow-xs`} />
-                    <span className="text-xs text-cream-800 dark:text-cream-200">{col.label}</span>
-                    {isSelected && (
-                      <Check className="w-3.5 h-3.5 ml-auto text-blush-500 dark:text-blush-400 shrink-0" />
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sanctuary Themes */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-medium text-cream-700 dark:text-cream-300">
+                Sanctuary Atmosphere:
+              </label>
+              <span className="text-[11px] font-medium text-blush-500 dark:text-blush-400">
+                {SANCTUARY_THEMES.find((t) => t.id === accentColor)?.name}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {SANCTUARY_THEMES.map((t) => {
+                const isSelected = accentColor === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => handleSelectTheme(t.id)}
+                    className={`flex items-center gap-3 p-3 rounded-2xl text-left border transition-all ${
+                      isSelected
+                        ? 'bg-white dark:bg-cozydark-800 border-blush-500 dark:border-blush-400 ring-2 ring-blush-400/30 shadow-xs'
+                        : 'bg-cream-100/70 dark:bg-cozydark-850/70 border-cream-200/90 dark:border-cozydark-750 hover:bg-cream-200/50 dark:hover:bg-cozydark-800/60'
+                    }`}
+                  >
+                    {/* Emoji Swatch Tile */}
+                    <div className="relative shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-cream-50 dark:bg-cozydark-900 border border-cream-200 dark:border-cozydark-700 shadow-2xs">
+                      <span className="text-base select-none">{t.emoji}</span>
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ${t.accentBg} ring-2 ring-white dark:ring-cozydark-850 shadow-xs`}
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-semibold text-cream-900 dark:text-cream-50 truncate">
+                          {t.name}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-cream-500 dark:text-cream-400 truncate">
+                        {t.subtitle}
+                      </p>
+                    </div>
+
+                    {isSelected ? (
+                      <div className="shrink-0 w-5 h-5 rounded-full bg-blush-500 dark:bg-blush-400 flex items-center justify-center text-white">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    ) : (
+                      <div className="shrink-0 w-4 h-4 rounded-full border border-cream-300 dark:border-cozydark-700" />
                     )}
                   </button>
                 );

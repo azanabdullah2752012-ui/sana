@@ -5,6 +5,7 @@ interface ThemeContextType {
   theme: 'light' | 'dark';
   themePreference: ThemePreference;
   setThemePreference: (pref: ThemePreference) => void;
+  toggleTheme: () => void;
   accentColor: AccentColor;
   setAccentColor: (accent: AccentColor) => void;
 }
@@ -84,12 +85,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     applyThemeToDOM(resolveIsDark(themePreference), validAccent);
   }, [themePreference, applyThemeToDOM]);
 
+  const toggleTheme = useCallback(() => {
+    const nextTheme: ThemePreference = resolvedTheme === 'dark' ? 'light' : 'dark';
+    setThemePreference(nextTheme);
+  }, [resolvedTheme, setThemePreference]);
+
   return (
     <ThemeContext.Provider
       value={{
         theme: resolvedTheme,
         themePreference,
         setThemePreference,
+        toggleTheme,
         accentColor,
         setAccentColor,
       }}

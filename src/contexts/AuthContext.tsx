@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase, isSupabaseConfigured, checkDatabaseSchemaReady } from '../lib/supabase';
-import { UserProfile, AuthorizedMember } from '../types/database';
+import { UserProfile, AuthorizedMember, ThemePreference, AccentColor } from '../types/database';
 import { BASE_USER_AZAN, BASE_USER_SANA, BASE_AUTHORIZED_MEMBERS } from '../lib/mockData';
 import { useTheme } from './ThemeContext';
 
@@ -100,11 +100,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthorizedMember(authRecord);
     setIsApproved(true);
 
-    if (initialProfile.theme_preference) {
-      setThemePreference(initialProfile.theme_preference);
+    const savedLocalTheme = (localStorage.getItem('sana_theme_pref') as ThemePreference) || initialProfile.theme_preference;
+    const savedLocalAccent = (localStorage.getItem('sana_accent_color') as AccentColor) || initialProfile.accent_color;
+
+    if (savedLocalTheme) {
+      setThemePreference(savedLocalTheme);
     }
-    if (initialProfile.accent_color) {
-      setAccentColor(initialProfile.accent_color);
+    if (savedLocalAccent) {
+      setAccentColor(savedLocalAccent);
     }
 
     // 2. Fetch latest live profile from Supabase and synchronize
@@ -124,10 +127,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ? loaded.bio
             : (cachedUser?.bio || '');
 
+          const activeLocalTheme = (localStorage.getItem('sana_theme_pref') as ThemePreference) || loaded.theme_preference;
+          const activeLocalAccent = (localStorage.getItem('sana_accent_color') as AccentColor) || loaded.accent_color;
+
           const merged: UserProfile = {
             ...loaded,
             avatar_url: resolvedAvatar,
             bio: resolvedBio,
+            theme_preference: activeLocalTheme,
+            accent_color: activeLocalAccent,
           };
 
           setProfile(merged);
@@ -142,11 +150,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .then(() => {});
           }
 
-          if (merged.theme_preference) {
-            setThemePreference(merged.theme_preference);
+          if (activeLocalTheme) {
+            setThemePreference(activeLocalTheme);
           }
-          if (merged.accent_color) {
-            setAccentColor(merged.accent_color);
+          if (activeLocalAccent) {
+            setAccentColor(activeLocalAccent);
           }
         }
 
@@ -353,6 +361,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (isSupabaseConfigured()) {
       try {
+        // Safe DB accent mapping so Supabase constraint never throws an error
+        const legacySafeAccent = ['blush', 'lavender', 'cream'].includes(updated.accent_color)
+          ? updated.accent_color
+          : 'blush';
+
         const { error } = await supabase
           .from('profiles')
           .update({
@@ -360,7 +373,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             avatar_url: updated.avatar_url,
             bio: updated.bio,
             theme_preference: updated.theme_preference,
-            accent_color: updated.accent_color,
+            accent_color: legacySafeAccent,
             updated_at: updated.updated_at,
           })
           .eq('id', profile.id);
