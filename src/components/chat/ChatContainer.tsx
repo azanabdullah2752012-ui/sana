@@ -67,7 +67,7 @@ export const ChatContainer: React.FC = () => {
 
       {/* Messages Stream */}
       <div className="flex-1 overflow-y-auto p-4 space-y-1">
-        {loading ? (
+        {loading && messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-cream-400 dark:text-cream-500 gap-2">
             <span className="w-6 h-6 border-2 border-blush-400 border-t-transparent rounded-full animate-spin" />
             <p className="text-xs font-serif">Opening our conversation nook...</p>

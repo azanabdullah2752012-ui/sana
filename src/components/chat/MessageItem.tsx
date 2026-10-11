@@ -58,14 +58,15 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     return content;
   };
 
-  // Group reactions by emoji
-  const reactionCounts = message.reactions.reduce((acc, curr) => {
+  // Group reactions by emoji (defensive fallback against undefined/null)
+  const safeReactions = Array.isArray(message.reactions) ? message.reactions : [];
+  const reactionCounts = safeReactions.reduce((acc, curr) => {
     acc[curr.emoji] = (acc[curr.emoji] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   const userReactedEmojis = new Set(
-    message.reactions.filter((r) => r.user_id === currentUserId).map((r) => r.emoji)
+    safeReactions.filter((r) => r.user_id === currentUserId).map((r) => r.emoji)
   );
 
   return (
