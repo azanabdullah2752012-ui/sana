@@ -27,7 +27,7 @@ export const ChatContainer: React.FC = () => {
   }, [messages.length, scrollToBottom]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4.5rem)] md:h-[calc(100vh-5rem)] max-w-4xl mx-auto rounded-3xl bg-cream-50/70 dark:bg-cozydark-900/70 border border-cream-200/80 dark:border-cozydark-800/80 shadow-cozy dark:shadow-cozy-dark overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-8rem)] md:h-[calc(100vh-5rem)] max-w-4xl mx-2 sm:mx-auto rounded-2xl sm:rounded-3xl bg-cream-50/70 dark:bg-cozydark-900/70 border border-cream-200/80 dark:border-cozydark-800/80 shadow-cozy dark:shadow-cozy-dark overflow-hidden">
       {/* Chat Header */}
       <div className="px-5 py-3.5 bg-cream-100/90 dark:bg-cozydark-850/90 border-b border-cream-200/80 dark:border-cozydark-800/80 flex items-center justify-between backdrop-blur-sm">
         <div className="flex items-center gap-3">

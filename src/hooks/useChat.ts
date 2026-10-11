@@ -1,13 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Message, MessageReaction } from '../types/database';
-import { INITIAL_MOCK_MESSAGES } from '../lib/mockData';
-
-const MOCK_STORAGE_KEY = 'sana_mock_messages';
+import { Message } from '../types/database';
 
 export function useChat() {
-  const { user, profile, partnerProfile, isApproved, isMockMode } = useAuth();
+  const { user, profile, isApproved } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
@@ -24,26 +21,10 @@ export function useChat() {
     }
   }, []);
 
-  // 1. Load messages from Supabase or Mock Storage
+  // 1. Load messages from Supabase
   const fetchMessages = useCallback(async () => {
     if (!isApproved) {
       setMessages([]);
-      setLoading(false);
-      return;
-    }
-
-    if (isMockMode) {
-      const stored = localStorage.getItem(MOCK_STORAGE_KEY);
-      if (stored) {
-        try {
-          setMessages(JSON.parse(stored));
-        } catch {
-          setMessages(INITIAL_MOCK_MESSAGES);
-        }
-      } else {
-        setMessages(INITIAL_MOCK_MESSAGES);
-        localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(INITIAL_MOCK_MESSAGES));
-      }
       setLoading(false);
       return;
     }
@@ -89,36 +70,16 @@ export function useChat() {
     } finally {
       setLoading(false);
     }
-  }, [isApproved, isMockMode]);
+  }, [isApproved]);
 
   // Initial load
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
 
-  // Setup Realtime or Mock Listener
+  // Setup Realtime Listener
   useEffect(() => {
     if (!isApproved) return;
-
-    if (isMockMode) {
-      const handleCustomEvent = (e: StorageEvent | CustomEvent) => {
-        const stored = localStorage.getItem(MOCK_STORAGE_KEY);
-        if (stored) {
-          try {
-            setMessages(JSON.parse(stored));
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      };
-
-      window.addEventListener('sana_chat_updated', handleCustomEvent as EventListener);
-      window.addEventListener('storage', handleCustomEvent);
-      return () => {
-        window.removeEventListener('sana_chat_updated', handleCustomEvent as EventListener);
-        window.removeEventListener('storage', handleCustomEvent);
-      };
-    }
 
     // Supabase Realtime channel
     const channel = supabase
@@ -142,46 +103,13 @@ export function useChat() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isApproved, isMockMode, fetchMessages]);
-
-  // Save helper for mock mode
-  const saveMockMessages = (newMessages: Message[]) => {
-    setMessages(newMessages);
-    localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(newMessages));
-    window.dispatchEvent(new CustomEvent('sana_chat_updated'));
-  };
+  }, [isApproved, fetchMessages]);
 
   // Send a new message
   const sendMessage = async (content: string) => {
     if (!content.trim() || !user || !profile || !isApproved) return;
 
     const trimmed = content.trim();
-
-    if (isMockMode) {
-      const newMsg: Message = {
-        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-        conversation_id: 'conv-001',
-        sender_id: user.id,
-        content: trimmed,
-        reply_to_id: replyingTo?.id || null,
-        reply_to: replyingTo
-          ? {
-              id: replyingTo.id,
-              sender_name: replyingTo.sender?.display_name || 'Friend',
-              content: replyingTo.content,
-            }
-          : null,
-        is_edited: false,
-        created_at: new Date().toISOString(),
-        reactions: [],
-        sender: profile,
-      };
-
-      saveMockMessages([...messages, newMsg]);
-      setReplyingTo(null);
-      setTimeout(() => scrollToBottom(true), 50);
-      return;
-    }
 
     try {
       const { error: sendError } = await supabase.from('messages').insert({
@@ -194,6 +122,7 @@ export function useChat() {
       if (sendError) throw sendError;
 
       setReplyingTo(null);
+      await fetchMessages();
       setTimeout(() => scrollToBottom(true), 50);
     } catch (err: any) {
       console.error('Failed to send message:', err);
@@ -204,22 +133,6 @@ export function useChat() {
   // Edit an existing message
   const editMessage = async (messageId: string, newContent: string) => {
     if (!newContent.trim() || !user) return;
-
-    if (isMockMode) {
-      const updated = messages.map((m) =>
-        m.id === messageId
-          ? {
-              ...m,
-              content: newContent.trim(),
-              is_edited: true,
-              edited_at: new Date().toISOString(),
-            }
-          : m
-      );
-      saveMockMessages(updated);
-      setEditingMessage(null);
-      return;
-    }
 
     try {
       const { error: editError } = await supabase
@@ -234,6 +147,7 @@ export function useChat() {
 
       if (editError) throw editError;
       setEditingMessage(null);
+      await fetchMessages();
     } catch (err: any) {
       console.error('Failed to edit message:', err);
       setError(err.message || 'Failed to edit message');
@@ -244,12 +158,6 @@ export function useChat() {
   const deleteMessage = async (messageId: string) => {
     if (!user) return;
 
-    if (isMockMode) {
-      const updated = messages.filter((m) => m.id !== messageId);
-      saveMockMessages(updated);
-      return;
-    }
-
     try {
       const { error: delError } = await supabase
         .from('messages')
@@ -258,6 +166,7 @@ export function useChat() {
         .eq('sender_id', user.id);
 
       if (delError) throw delError;
+      await fetchMessages();
     } catch (err: any) {
       console.error('Failed to delete message:', err);
       setError(err.message || 'Failed to delete message');
@@ -267,36 +176,6 @@ export function useChat() {
   // Toggle emoji reaction
   const toggleReaction = async (messageId: string, emoji: string) => {
     if (!user) return;
-
-    if (isMockMode) {
-      const updated = messages.map((msg) => {
-        if (msg.id !== messageId) return msg;
-
-        const existingIdx = msg.reactions.findIndex(
-          (r) => r.user_id === user.id && r.emoji === emoji
-        );
-
-        let newReactions = [...msg.reactions];
-        if (existingIdx >= 0) {
-          // Remove reaction
-          newReactions.splice(existingIdx, 1);
-        } else {
-          // Add reaction
-          newReactions.push({
-            id: `react-${Date.now()}-${Math.random()}`,
-            message_id: messageId,
-            user_id: user.id,
-            emoji,
-            created_at: new Date().toISOString(),
-            user_name: profile?.display_name,
-          });
-        }
-        return { ...msg, reactions: newReactions };
-      });
-
-      saveMockMessages(updated);
-      return;
-    }
 
     try {
       // Check if user already reacted with this emoji
@@ -317,6 +196,7 @@ export function useChat() {
           emoji,
         });
       }
+      await fetchMessages();
     } catch (err: any) {
       console.error('Failed to toggle reaction:', err);
     }

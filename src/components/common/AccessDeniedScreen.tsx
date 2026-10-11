@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Lock, ShieldAlert, LogOut, HeartHandshake } from 'lucide-react';
 
 export const AccessDeniedScreen: React.FC = () => {
-  const { user, signOut, switchDemoUser, isMockMode } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-cream-100 dark:bg-cozydark-950">
@@ -20,8 +20,8 @@ export const AccessDeniedScreen: React.FC = () => {
           Private Sanctuary
         </h2>
         <p className="text-sm text-cream-600 dark:text-cream-300 leading-relaxed mb-6">
-          This is an invite-only space exclusively reserved for <strong>Sana</strong> and{' '}
-          <strong>Azan</strong>. Access requires the secret passcode (<code className="text-xs bg-cream-200/60 dark:bg-cozydark-800 px-1.5 py-0.5 rounded text-blush-600 dark:text-blush-300">azanisthebest</code> or <code className="text-xs bg-cream-200/60 dark:bg-cozydark-800 px-1.5 py-0.5 rounded text-lavender-600 dark:text-lavender-300">sanaisthebest</code>).
+          This is a private sanctuary exclusively reserved for <strong>Sana</strong> and{' '}
+          <strong>Azan</strong>. Access requires an authorized secret passcode.
         </p>
 
         <div className="p-4 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/70 dark:border-cozydark-800 text-left mb-6 text-xs text-cream-600 dark:text-cream-400 space-y-2">
@@ -40,30 +40,8 @@ export const AccessDeniedScreen: React.FC = () => {
             className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-cream-200/80 dark:bg-cozydark-800 hover:bg-cream-300/80 dark:hover:bg-cozydark-750 text-cream-800 dark:text-cream-200 text-sm font-medium transition-all"
           >
             <LogOut className="w-4 h-4" />
-            Sign Out
+            Return to Entrance
           </button>
-
-          {isMockMode && (
-            <div className="pt-3 border-t border-cream-200/60 dark:border-cozydark-800">
-              <p className="text-[11px] text-cream-500 dark:text-cream-400 mb-2">
-                Testing Demo Mode? Switch back to an approved account:
-              </p>
-              <div className="flex justify-center gap-2">
-                <button
-                  onClick={() => switchDemoUser('azan')}
-                  className="px-3 py-1.5 rounded-xl bg-blush-100 text-blush-700 dark:bg-blush-950/60 dark:text-blush-300 text-xs font-medium hover:bg-blush-200 transition-colors"
-                >
-                  Switch to Azan
-                </button>
-                <button
-                  onClick={() => switchDemoUser('sana')}
-                  className="px-3 py-1.5 rounded-xl bg-lavender-100 text-lavender-700 dark:bg-lavender-950/60 dark:text-lavender-300 text-xs font-medium hover:bg-lavender-200 transition-colors"
-                >
-                  Switch to Sana
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

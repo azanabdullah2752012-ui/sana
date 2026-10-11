@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase, isSupabaseConfigured, checkDatabaseSchemaReady } from '../lib/supabase';
 import { UserProfile, AuthorizedMember } from '../types/database';
-import { MOCK_USER_AZAN, MOCK_USER_SANA, MOCK_AUTHORIZED_MEMBERS } from '../lib/mockData';
+import { BASE_USER_AZAN, BASE_USER_SANA, BASE_AUTHORIZED_MEMBERS } from '../lib/mockData';
 
-export const AZAN_PASSCODE = 'azanisthebest';
-export const SANA_PASSCODE = 'sanaisthebest';
+const AZAN_PASSCODE = 'azanisthebest';
+const SANA_PASSCODE = 'sanaisthebest';
 
 const SESSION_STORAGE_KEY = 'sana_auth_session';
 
@@ -21,15 +21,13 @@ interface AuthContextType {
   authorizedMember: AuthorizedMember | null;
   isApproved: boolean;
   isLoading: boolean;
-  isMockMode: boolean;
   isSchemaReady: boolean;
   schemaError: string | null;
   checkSchema: () => Promise<boolean>;
   signInWithPasscode: (passcode: string) => Promise<{ error: Error | null; user?: AuthUser }>;
-  signIn: (passcodeOrEmail: string, optionalPassword?: string) => Promise<{ error: Error | null }>;
+  signIn: (passcode: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: Error | null }>;
-  switchDemoUser: (userType: 'azan' | 'sana') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,7 +41,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSchemaReady, setIsSchemaReady] = useState<boolean>(true);
   const [schemaError, setSchemaError] = useState<string | null>(null);
-  const [isMockMode, setIsMockMode] = useState<boolean>(!isSupabaseConfigured());
 
   const checkSchema = useCallback(async () => {
     if (!isSupabaseConfigured()) {
@@ -59,9 +56,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadUserDataForRole = useCallback(async (role: 'member_1' | 'member_2') => {
     const isAzan = role === 'member_1';
-    const currentBase = isAzan ? MOCK_USER_AZAN : MOCK_USER_SANA;
-    const partnerBase = isAzan ? MOCK_USER_SANA : MOCK_USER_AZAN;
-    const authRecord = isAzan ? MOCK_AUTHORIZED_MEMBERS[0] : MOCK_AUTHORIZED_MEMBERS[1];
+    const currentBase = isAzan ? BASE_USER_AZAN : BASE_USER_SANA;
+    const partnerBase = isAzan ? BASE_USER_SANA : BASE_USER_AZAN;
+    const authRecord = isAzan ? BASE_AUTHORIZED_MEMBERS[0] : BASE_AUTHORIZED_MEMBERS[1];
 
     const authUser: AuthUser = {
       id: currentBase.id,
@@ -75,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (isSupabaseConfigured()) {
       try {
-        // Try to fetch updated profile from Supabase profiles table
+        // Fetch current user profile from Supabase
         const { data: dbProfile } = await supabase
           .from('profiles')
           .select('*')
@@ -88,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfile(currentBase);
         }
 
-        // Fetch partner profile
+        // Fetch partner profile from Supabase
         const { data: dbPartner } = await supabase
           .from('profiles')
           .select('*')
@@ -149,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ passcode: AZAN_PASSCODE }));
       return {
         error: null,
-        user: { id: MOCK_USER_AZAN.id, display_name: 'Azan', role: 'member_1' },
+        user: { id: BASE_USER_AZAN.id, display_name: 'Azan', role: 'member_1' },
       };
     }
 
@@ -158,19 +155,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ passcode: SANA_PASSCODE }));
       return {
         error: null,
-        user: { id: MOCK_USER_SANA.id, display_name: 'Sana', role: 'member_2' },
+        user: { id: BASE_USER_SANA.id, display_name: 'Sana', role: 'member_2' },
       };
     }
 
     return {
-      error: new Error('Incorrect secret passcode. This sanctuary is strictly for Azan and Sana 🌸'),
+      error: new Error('Incorrect secret passcode. Access denied 🌸'),
     };
   };
 
-  // General signIn helper supporting single passcode or dual params
-  const signIn = async (passcodeOrEmail: string, optionalPassword?: string) => {
-    const code = optionalPassword || passcodeOrEmail;
-    const { error } = await signInWithPasscode(code);
+  const signIn = async (passcode: string) => {
+    const { error } = await signInWithPasscode(passcode);
     return { error };
   };
 
@@ -181,14 +176,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPartnerProfile(null);
     setAuthorizedMember(null);
     setIsApproved(false);
-  };
-
-  const switchDemoUser = (userType: 'azan' | 'sana') => {
-    if (userType === 'azan') {
-      signInWithPasscode(AZAN_PASSCODE);
-    } else {
-      signInWithPasscode(SANA_PASSCODE);
-    }
   };
 
   const updateProfile = async (updates: Partial<UserProfile>): Promise<{ error: Error | null }> => {
@@ -202,7 +189,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setProfile(updated);
 
-    if (isSupabaseConfigured() && isSchemaReady) {
+    if (isSupabaseConfigured()) {
       try {
         const { error } = await supabase
           .from('profiles')
@@ -234,7 +221,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authorizedMember,
         isApproved,
         isLoading,
-        isMockMode,
         isSchemaReady,
         schemaError,
         checkSchema,
@@ -242,7 +228,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signIn,
         signOut,
         updateProfile,
-        switchDemoUser,
       }}
     >
       {children}

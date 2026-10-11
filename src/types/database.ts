@@ -1,6 +1,6 @@
 export type UserRole = 'member_1' | 'member_2';
 export type ThemePreference = 'light' | 'dark' | 'system';
-export type AccentColor = 'blush' | 'lavender' | 'cream';
+export type AccentColor = 'blush' | 'lavender' | 'cream' | 'rose' | 'peach' | 'mint' | 'sky' | 'violet';
 
 export interface UserProfile {
   id: string;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth, AZAN_PASSCODE, SANA_PASSCODE } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Modal } from '../common/Modal';
 import { useToast } from '../common/Toast';
-import { KeyRound, ArrowRight, Sparkles, Heart, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { KeyRound, ArrowRight, Sparkles, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -31,25 +31,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       if (error) {
         showToast(error.message, 'error');
       } else {
-        showToast(`Welcome home, ${user?.display_name}! 🌸✨`, 'success');
+        showToast(`Welcome back, ${user?.display_name}! 🌸✨`, 'success');
         onClose();
       }
     } catch (err: any) {
-      showToast(err.message || 'Incorrect secret passcode', 'error');
+      showToast(err.message || 'Incorrect passcode', 'error');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickLogin = async (code: string) => {
-    setPasscode(code);
-    setLoading(true);
-    const { error, user } = await signInWithPasscode(code);
-    if (!error) {
-      showToast(`Welcome home, ${user?.display_name}! 🌸✨`, 'success');
-      onClose();
-    }
-    setLoading(false);
   };
 
   return (
@@ -65,50 +54,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       }
     >
       <div className="space-y-5 pt-1">
-        {/* Intro */}
         <p className="text-xs text-cream-600 dark:text-cream-300 leading-relaxed text-center font-light">
-          No emails required. Enter your secret passcode to step inside our private space.
+          Enter your secret passcode to step inside our private space.
         </p>
 
-        {/* Quick Persona Buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => handleQuickLogin(AZAN_PASSCODE)}
-            className="p-3.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 hover:bg-cream-200/90 dark:hover:bg-cozydark-800 border border-cream-200 dark:border-cozydark-750 transition-all text-center group"
-          >
-            <span className="text-2xl block mb-1">☕</span>
-            <span className="font-serif font-semibold text-sm text-cream-900 dark:text-cream-50 block">
-              I'm Azan
-            </span>
-            <span className="text-[10px] text-cream-400 block mt-0.5">
-              Passcode: azanisthebest
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleQuickLogin(SANA_PASSCODE)}
-            className="p-3.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 hover:bg-cream-200/90 dark:hover:bg-cozydark-800 border border-cream-200 dark:border-cozydark-750 transition-all text-center group"
-          >
-            <span className="text-2xl block mb-1">🌸</span>
-            <span className="font-serif font-semibold text-sm text-cream-900 dark:text-cream-50 block">
-              I'm Sana
-            </span>
-            <span className="text-[10px] text-cream-400 block mt-0.5">
-              Passcode: sanaisthebest
-            </span>
-          </button>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-cream-200 dark:bg-cozydark-800" />
-          <span className="text-[11px] text-cream-400 uppercase tracking-wider">or enter passcode</span>
-          <div className="flex-1 h-px bg-cream-200 dark:bg-cozydark-800" />
-        </div>
-
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 mb-1.5">
@@ -119,15 +68,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="azanisthebest or sanaisthebest"
+                autoFocus
+                placeholder="Enter passcode..."
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300 dark:focus:ring-blush-600"
+                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300 dark:focus:ring-blush-600"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-400 hover:text-cream-600"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-400 hover:text-cream-600 min-h-[36px] min-w-[36px] flex items-center justify-center"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -137,7 +87,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <button
             type="submit"
             disabled={loading || !passcode.trim()}
-            className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-blush-400 to-blush-500 hover:from-blush-500 hover:to-blush-600 text-white font-medium text-sm shadow-cozy hover:shadow-cozy-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blush-400 to-blush-500 hover:from-blush-500 hover:to-blush-600 text-white font-medium text-sm shadow-cozy hover:shadow-cozy-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

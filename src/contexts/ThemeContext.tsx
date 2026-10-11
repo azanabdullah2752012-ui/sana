@@ -51,6 +51,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [resolvedTheme]);
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-accent', accentColor);
+  }, [accentColor]);
+
   const setThemePreference = (pref: ThemePreference) => {
     setThemePreferenceState(pref);
     localStorage.setItem('sana_theme_pref', pref);

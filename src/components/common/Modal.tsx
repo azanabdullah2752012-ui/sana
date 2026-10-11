@@ -52,14 +52,14 @@ export const Modal: React.FC<ModalProps> = ({
           {title && <div className="text-xl font-serif font-medium text-cream-900 dark:text-cream-100">{title}</div>}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-cream-400 hover:text-cream-700 hover:bg-cream-100 dark:hover:text-cream-200 dark:hover:bg-cozydark-800 transition-colors ml-auto"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-cream-400 hover:text-cream-700 hover:bg-cream-100 dark:hover:text-cream-200 dark:hover:bg-cozydark-800 transition-colors ml-auto -mr-2"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="max-h-[75vh] overflow-y-auto pr-1">
+        <div className="max-h-[80dvh] overflow-y-auto pr-1">
           {children}
         </div>
       </div>
