@@ -8,6 +8,8 @@ export interface GifItem {
 }
 
 // Key access and storage
+export const DEFAULT_KLIPY_API_KEY = 'JJJxeYn0wHhCLk6DVFYiHOJCwFujQvJSTFCmRm5NDXRE4nmfYqDU1edMh3trwE2e';
+
 export function getKlipyApiKey(): string {
   try {
     if (typeof window !== 'undefined') {
@@ -15,7 +17,7 @@ export function getKlipyApiKey(): string {
       if (stored && stored.trim()) return stored.trim();
     }
   } catch {}
-  return (import.meta.env.VITE_KLIPY_API_KEY || '').trim();
+  return (import.meta.env.VITE_KLIPY_API_KEY || DEFAULT_KLIPY_API_KEY).trim();
 }
 
 export function setKlipyApiKey(key: string): void {
@@ -212,22 +214,29 @@ function parseKlipyItem(item: any): GifItem | null {
   const id = String(item.id || item.slug || Math.random());
   const title = String(item.title || item.name || 'KLIPY GIF');
 
-  // KLIPY media object structure: item.files (or item.file)
-  const files = item.files || item.file || {};
-  
+  // KLIPY media object structure: item.file or item.files with format tiers (hd, md, sm, xs)
+  const file = item.file || item.files || {};
+
+  // Best display resolution for message lightbox/bubble (md -> hd -> sm -> direct)
   const originalUrl =
-    files?.gif?.url ||
-    files?.hd?.url ||
-    files?.md?.url ||
-    files?.sm?.url ||
+    file.md?.gif?.url ||
+    file.hd?.gif?.url ||
+    file.sm?.gif?.url ||
+    file.gif?.url ||
+    file.md?.webp?.url ||
+    file.hd?.webp?.url ||
     item.url ||
     item.media_url ||
     '';
 
+  // Fast loading thumbnail for picker grid (sm -> xs -> md -> fallback)
   const previewUrl =
-    files?.sm?.url ||
-    files?.xs?.url ||
-    files?.md?.url ||
+    file.sm?.gif?.url ||
+    file.sm?.webp?.url ||
+    file.xs?.gif?.url ||
+    file.xs?.webp?.url ||
+    file.sm?.jpg?.url ||
+    file.md?.gif?.url ||
     originalUrl;
 
   if (!originalUrl) return null;
