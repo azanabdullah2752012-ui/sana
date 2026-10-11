@@ -48,7 +48,7 @@ const AppContent: React.FC = () => {
 
   // 4. Authenticated & Approved: Render Sanctuary
   return (
-    <div className="min-h-screen text-cream-900 dark:text-cream-100 transition-colors flex flex-col pb-20 md:pb-6 relative bg-cream-100/90 dark:bg-cozydark-950/90">
+    <div className="min-h-screen text-cream-900 dark:text-cream-100 transition-colors flex flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6 relative bg-cream-100/90 dark:bg-cozydark-950/90">
       {/* Dynamic Atmospheric Wallpaper Backdrop */}
       <WallpaperBackground />
 

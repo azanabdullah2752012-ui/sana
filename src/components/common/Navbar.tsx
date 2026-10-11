@@ -160,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Bottom Fixed Navigation Bar */}
       <nav
         aria-label="Mobile Navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl bg-cream-50/95 dark:bg-cozydark-950/95 border-t border-cream-200/80 dark:border-cozydark-750 px-2 py-1 flex justify-around items-center shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl bg-cream-50/95 dark:bg-cozydark-950/95 border-t border-cream-200/80 dark:border-cozydark-750 px-2 pt-1 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex justify-around items-center shadow-lg"
       >
         {navItems.map((item) => {
           const Icon = item.icon;
