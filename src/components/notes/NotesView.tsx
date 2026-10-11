@@ -83,7 +83,7 @@ export const NotesView: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                 selectedCategory === cat.id
                   ? 'bg-blush-500 text-white shadow-sm'
-                  : 'bg-cream-100 dark:bg-cozydark-850 text-cream-600 dark:text-cream-300 hover:bg-cream-200/80 dark:hover:bg-cozydark-800 border border-cream-200 dark:border-cozydark-800'
+                  : 'bg-cream-100 dark:bg-cozydark-850 text-cream-600 dark:text-cream-300 hover:bg-cream-200/80 dark:hover:bg-cozydark-800 border border-cream-200 dark:border-cozydark-750'
               }`}
             >
               {cat.label}
@@ -93,13 +93,13 @@ export const NotesView: React.FC = () => {
 
         {/* Search Input */}
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400 dark:text-cozydark-500" />
           <input
             type="text"
             placeholder="Search within notes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-cream-50/80 dark:bg-cozydark-900/80 border border-cream-200/80 dark:border-cozydark-800 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none focus:ring-1 focus:ring-blush-300 backdrop-blur-sm"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-cream-50/80 dark:bg-cozydark-900/80 border border-cream-200/80 dark:border-cozydark-750 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400 backdrop-blur-sm"
           />
         </div>
       </div>
@@ -111,7 +111,7 @@ export const NotesView: React.FC = () => {
           <p className="text-xs font-serif">Opening our shared pages...</p>
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div className="py-20 text-center bg-cream-50/50 dark:bg-cozydark-900/40 rounded-3xl border border-cream-200/80 dark:border-cozydark-800 p-8">
+        <div className="py-20 text-center bg-cream-50/50 dark:bg-cozydark-900/40 rounded-3xl border border-cream-200/80 dark:border-cozydark-750 p-8">
           <div className="w-14 h-14 rounded-3xl bg-blush-100 dark:bg-blush-950/60 flex items-center justify-center mx-auto mb-3 text-blush-500">
             <BookOpen className="w-7 h-7" />
           </div>

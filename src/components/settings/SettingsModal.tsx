@@ -6,6 +6,7 @@ import { Avatar } from '../common/Avatar';
 import { useToast } from '../common/Toast';
 import { uploadMemoryImage } from '../../lib/storage';
 import { ThemePreference, AccentColor } from '../../types/database';
+import { getKlipyApiKey, setKlipyApiKey } from '../../lib/gifs';
 import {
   User,
   Shield,
@@ -15,6 +16,8 @@ import {
   Upload,
   Camera,
   Check,
+  Film,
+  Key,
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -47,12 +50,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [klipyApiKeyInput, setKlipyApiKeyInput] = useState(() => getKlipyApiKey());
 
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || '');
       setBio(profile.bio || '');
       setAvatarUrl(profile.avatar_url || null);
+      setKlipyApiKeyInput(getKlipyApiKey());
     }
   }, [profile, isOpen]);
 
@@ -95,8 +100,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         accent_color: accentColor,
       });
 
+      setKlipyApiKey(klipyApiKeyInput.trim());
+
       if (error) throw error;
-      showToast('Profile updated successfully! ✨', 'success');
+      showToast('Profile and preferences updated! ✨', 'success');
       onClose();
     } catch (err: any) {
       showToast(err.message || 'Failed to update profile', 'error');
@@ -267,8 +274,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* 3. Security Status Badge */}
-        <div className="p-4 rounded-2xl bg-cream-100/60 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-800 text-xs space-y-1">
+        {/* 3. KLIPY GIF Cinema Integration */}
+        <div>
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 mb-2 flex items-center gap-1.5">
+            <Film className="w-4 h-4 text-blush-400" />
+            <span>KLIPY GIF Engine</span>
+          </h4>
+
+          <div className="p-3.5 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-750 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-xs font-medium text-cream-800 dark:text-cream-200 flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-blush-500" />
+                <span>KLIPY API Key</span>
+              </span>
+              <a
+                href="https://partner.klipy.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[10px] text-blush-600 dark:text-blush-400 hover:underline"
+              >
+                Get API key ↗
+              </a>
+            </div>
+
+            <input
+              type="text"
+              placeholder="Paste KLIPY Partner API key (optional)..."
+              value={klipyApiKeyInput}
+              onChange={(e) => setKlipyApiKeyInput(e.target.value)}
+              className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 font-mono focus:outline-none focus:ring-1 focus:ring-blush-400"
+            />
+            <p className="text-[10px] text-cream-500 dark:text-cream-400 font-light">
+              Powers real-time GIF search and trending reactions in the chat.
+            </p>
+          </div>
+        </div>
+
+        {/* 4. Security Status Badge */}
+        <div className="p-4 rounded-2xl bg-cream-100/60 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-750 text-xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 font-semibold text-cream-900 dark:text-cream-100">
               <Shield className="w-4 h-4 text-emerald-500" />

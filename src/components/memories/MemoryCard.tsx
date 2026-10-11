@@ -29,7 +29,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
 
   return (
     <>
-      <div className="group rounded-3xl bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy hover:shadow-cozy-lg dark:shadow-cozy-dark dark:hover:shadow-cozy-dark-lg transition-all duration-300 overflow-hidden flex flex-col justify-between hover:-translate-y-1">
+      <div className="group rounded-3xl bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy hover:shadow-cozy-lg dark:shadow-cozy-dark dark:hover:shadow-cozy-dark-lg transition-all duration-300 overflow-hidden flex flex-col justify-between hover:-translate-y-1">
         
         {/* Memory Image with Polaroid vibe */}
         {memory.image_url && (

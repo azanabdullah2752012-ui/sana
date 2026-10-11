@@ -96,7 +96,7 @@ export const QuestionGeneratorModal: React.FC<QuestionGeneratorModalProps> = ({
         <div className="flex flex-col sm:flex-row gap-2.5">
           <button
             onClick={() => generateNew()}
-            className="flex-1 py-2.5 px-4 rounded-2xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 dark:hover:bg-cozydark-800 text-cream-800 dark:text-cream-200 text-xs font-medium flex items-center justify-center gap-2 border border-cream-200 dark:border-cozydark-800 transition-colors"
+            className="flex-1 py-2.5 px-4 rounded-2xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 dark:hover:bg-cozydark-800 text-cream-800 dark:text-cream-200 text-xs font-medium flex items-center justify-center gap-2 border border-cream-200 dark:border-cozydark-750 transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Generate Another</span>
@@ -104,7 +104,7 @@ export const QuestionGeneratorModal: React.FC<QuestionGeneratorModalProps> = ({
 
           <button
             onClick={handleCopy}
-            className="py-2.5 px-4 rounded-2xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 dark:hover:bg-cozydark-800 text-cream-800 dark:text-cream-200 text-xs font-medium flex items-center justify-center gap-2 border border-cream-200 dark:border-cozydark-800 transition-colors"
+            className="py-2.5 px-4 rounded-2xl bg-cream-100 dark:bg-cozydark-850 hover:bg-cream-200 dark:hover:bg-cozydark-800 text-cream-800 dark:text-cream-200 text-xs font-medium flex items-center justify-center gap-2 border border-cream-200 dark:border-cozydark-750 transition-colors"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
             <span>Copy</span>

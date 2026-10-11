@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Message } from '../../types/database';
 import { Avatar } from '../common/Avatar';
-import { Reply, Edit2, Trash2, Smile, Check, X, Film, Sparkles } from 'lucide-react';
+import { Reply, Edit2, Trash2, Smile, Check, X, Film, Sparkles, Maximize2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseStickerMessage } from '../../lib/stickers';
 import { parseGifMessage } from '../../lib/gifs';
@@ -30,6 +30,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
+  const [gifLightboxOpen, setGifLightboxOpen] = useState(false);
 
   const stickerInfo = parseStickerMessage(message.content);
   const gifInfo = parseGifMessage(message.content);
@@ -158,16 +159,25 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               )}
             </div>
           ) : gifInfo.isGif ? (
-            /* Animated GIF Rendering */
-            <div className="relative rounded-2xl overflow-hidden shadow-cozy border border-cream-200/80 dark:border-cozydark-800 bg-cream-100/50 dark:bg-cozydark-850 max-w-[240px] sm:max-w-[320px]">
+            /* Animated KLIPY GIF Rendering */
+            <div
+              onClick={() => setGifLightboxOpen(true)}
+              className="group/gif relative rounded-2xl overflow-hidden shadow-cozy border border-cream-200/80 dark:border-cozydark-700 bg-cream-100/50 dark:bg-cozydark-850 max-w-[260px] sm:max-w-[340px] cursor-pointer hover:border-blush-400 dark:hover:border-blush-600 transition-all active:scale-[0.99]"
+              title="Click to view full GIF"
+            >
               <img
                 src={gifInfo.url}
-                alt="GIF"
-                className="w-full h-auto max-h-64 object-cover rounded-2xl"
+                alt="KLIPY GIF"
+                className="w-full h-auto max-h-72 object-contain rounded-2xl"
                 loading="lazy"
               />
-              <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-black/60 text-[9px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
-                GIF
+              <div className="absolute inset-0 bg-black/25 opacity-0 group-hover/gif:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-xs">
+                  <Maximize2 className="w-4 h-4" />
+                </span>
+              </div>
+              <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-black/60 text-[9px] font-bold text-white uppercase tracking-wider backdrop-blur-xs pointer-events-none">
+                KLIPY
               </span>
             </div>
           ) : (
@@ -175,8 +185,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             <div
               className={`px-4 py-2.5 rounded-2.5xl text-sm leading-relaxed shadow-sm break-words select-text ${
                 isMe
-                  ? 'bg-gradient-to-br from-blush-300 via-blush-200 to-blush-300/90 text-blush-950 dark:from-blush-900 dark:via-blush-850 dark:to-blush-900 dark:text-blush-50 rounded-br-sm'
-                  : 'bg-white dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-100 rounded-bl-sm'
+                  ? 'bg-gradient-to-br from-blush-200 via-blush-100 to-blush-200/90 text-blush-950 border border-blush-300/60 dark:from-blush-900/80 dark:via-blush-800/70 dark:to-blush-900/80 dark:text-cream-50 dark:border-blush-700/50 rounded-br-sm shadow-xs'
+                  : 'bg-white dark:bg-cozydark-800 border border-cream-200/80 dark:border-cozydark-700 text-cream-900 dark:text-cream-50 rounded-bl-sm shadow-xs'
               }`}
             >
               {message.content}
@@ -282,6 +292,31 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         )}
       </div>
+
+      {/* KLIPY GIF Fullscreen Lightbox */}
+      {gifLightboxOpen && gifInfo.url && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setGifLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setGifLightboxOpen(false)}
+            className="absolute top-5 right-5 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div className="max-w-3xl max-h-[90vh] flex flex-col items-center">
+            <img
+              src={gifInfo.url}
+              alt="KLIPY GIF"
+              className="max-h-[82vh] w-auto rounded-2xl shadow-2xl object-contain"
+            />
+            <span className="text-white/80 font-mono text-xs mt-3 uppercase tracking-wider">
+              KLIPY GIF • Tap anywhere to close
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

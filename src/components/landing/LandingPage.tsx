@@ -145,22 +145,22 @@ export const LandingPage: React.FC = () => {
         </p>
 
         {/* Inline Mobile-Friendly Secret Passcode Entrance */}
-        <div className="w-full max-w-md p-5 sm:p-7 rounded-3xl sm:rounded-4xl bg-cream-50/95 dark:bg-cozydark-900/95 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy-lg dark:shadow-cozy-dark-lg mb-10 sm:mb-14">
+        <div className="w-full max-w-md p-5 sm:p-7 rounded-3xl sm:rounded-4xl bg-cream-50/95 dark:bg-cozydark-900/95 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy-lg dark:shadow-cozy-dark-lg mb-10 sm:mb-14">
           <form onSubmit={handleUnlock} className="space-y-3.5">
             <div className="relative">
-              <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400" />
+              <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400 dark:text-cozydark-500" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="Enter secret passcode..."
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300 dark:focus:ring-blush-600"
+                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-400 hover:text-cream-600 p-1"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-400 hover:text-cream-600 dark:hover:text-cream-200 p-1"
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -196,7 +196,7 @@ export const LandingPage: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="p-5 rounded-3xl bg-cream-100/70 dark:bg-cozydark-900/80 border border-cream-200/80 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark"
+                className="p-5 rounded-3xl bg-cream-100/70 dark:bg-cozydark-900/80 border border-cream-200/80 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark"
               >
                 <div
                   className={`w-10 h-10 rounded-2xl ${feat.color} flex items-center justify-center mb-3 shadow-sm`}

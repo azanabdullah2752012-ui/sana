@@ -7,7 +7,7 @@ export const AccessDeniedScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-cream-100 dark:bg-cozydark-950">
-      <div className="max-w-md w-full bg-cream-50 dark:bg-cozydark-900 rounded-3xl p-8 border border-cream-200 dark:border-cozydark-800 shadow-cozy-lg text-center relative overflow-hidden animate-slide-up">
+      <div className="max-w-md w-full bg-cream-50 dark:bg-cozydark-900 rounded-3xl p-8 border border-cream-200 dark:border-cozydark-750 shadow-cozy-lg text-center relative overflow-hidden animate-slide-up">
         {/* Soft Background Accents */}
         <div className="absolute -top-12 -right-12 w-36 h-36 bg-blush-200/40 dark:bg-blush-900/20 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-lavender-200/40 dark:bg-lavender-900/20 rounded-full blur-2xl pointer-events-none" />
@@ -24,7 +24,7 @@ export const AccessDeniedScreen: React.FC = () => {
           <strong>Azan</strong>. Access requires an authorized secret passcode.
         </p>
 
-        <div className="p-4 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/70 dark:border-cozydark-800 text-left mb-6 text-xs text-cream-600 dark:text-cream-400 space-y-2">
+        <div className="p-4 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/70 dark:border-cozydark-750 text-left mb-6 text-xs text-cream-600 dark:text-cream-400 space-y-2">
           <div className="flex items-center gap-2 font-medium text-cream-800 dark:text-cream-200">
             <ShieldAlert className="w-4 h-4 text-amber-500" />
             <span>Database Row Level Security Active</span>

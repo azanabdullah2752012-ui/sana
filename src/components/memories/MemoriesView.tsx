@@ -76,16 +76,16 @@ export const MemoriesView: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-cream-50/80 dark:bg-cozydark-900/80 p-2.5 rounded-2xl border border-cream-200/80 dark:border-cozydark-800 backdrop-blur-sm">
+      <div className="flex flex-col sm:flex-row items-center gap-3 bg-cream-50/80 dark:bg-cozydark-900/80 p-2.5 rounded-2xl border border-cream-200/80 dark:border-cozydark-750 backdrop-blur-sm">
         {/* Search */}
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400 dark:text-cozydark-500" />
           <input
             type="text"
             placeholder="Search memories, locations, or tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-cream-100/70 dark:bg-cozydark-850 border-none text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none focus:ring-1 focus:ring-blush-300"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/60 dark:border-cozydark-750 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400"
           />
         </div>
 
@@ -95,7 +95,7 @@ export const MemoriesView: React.FC = () => {
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all shrink-0 w-full sm:w-auto justify-center ${
             filterFavorites
               ? 'bg-blush-100 text-blush-800 dark:bg-blush-950 dark:text-blush-200 border border-blush-300 dark:border-blush-700'
-              : 'bg-cream-100/70 dark:bg-cozydark-850 text-cream-600 dark:text-cream-400 hover:text-cream-900'
+              : 'bg-cream-100/70 dark:bg-cozydark-850 text-cream-600 dark:text-cream-400 hover:text-cream-900 border border-cream-200/80 dark:border-cozydark-750'
           }`}
         >
           <Heart className={`w-3.5 h-3.5 ${filterFavorites ? 'fill-blush-500 text-blush-500' : ''}`} />
@@ -110,7 +110,7 @@ export const MemoriesView: React.FC = () => {
           <p className="text-xs font-serif">Unfolding our scrapbook...</p>
         </div>
       ) : filteredMemories.length === 0 ? (
-        <div className="py-20 text-center bg-cream-50/50 dark:bg-cozydark-900/40 rounded-3xl border border-cream-200/80 dark:border-cozydark-800 p-8">
+        <div className="py-20 text-center bg-cream-50/50 dark:bg-cozydark-900/40 rounded-3xl border border-cream-200/80 dark:border-cozydark-750 p-8">
           <div className="w-14 h-14 rounded-3xl bg-blush-100 dark:bg-blush-950/60 flex items-center justify-center mx-auto mb-3 text-blush-500">
             <Camera className="w-7 h-7" />
           </div>

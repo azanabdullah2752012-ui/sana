@@ -124,7 +124,7 @@ export const StickerPickerModal: React.FC<StickerPickerModalProps> = ({
     >
       <div className="space-y-4 pt-1">
         {/* Main Tab Toggle */}
-        <div className="flex rounded-2xl bg-cream-100 dark:bg-cozydark-850 p-1 border border-cream-200 dark:border-cozydark-800">
+        <div className="flex rounded-2xl bg-cream-100 dark:bg-cozydark-850 p-1 border border-cream-200 dark:border-cozydark-750">
           <button
             type="button"
             onClick={() => setActiveTab('presets')}
@@ -180,7 +180,7 @@ export const StickerPickerModal: React.FC<StickerPickerModalProps> = ({
                     onSelectSticker(stk);
                     onClose();
                   }}
-                  className="group flex flex-col items-center justify-center p-3 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850/80 hover:bg-blush-50 dark:hover:bg-blush-950/40 border border-cream-200/80 dark:border-cozydark-800 hover:border-blush-300 dark:hover:border-blush-700 transition-all transform active:scale-95"
+                  className="group flex flex-col items-center justify-center p-3 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850/80 hover:bg-blush-50 dark:hover:bg-blush-950/40 border border-cream-200/80 dark:border-cozydark-750 hover:border-blush-300 dark:hover:border-blush-700 transition-all transform active:scale-95"
                   title={stk.name}
                 >
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden mb-2 bg-white/60 dark:bg-black/20 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
@@ -206,7 +206,7 @@ export const StickerPickerModal: React.FC<StickerPickerModalProps> = ({
             {/* Upload Creator Card */}
             <form
               onSubmit={handleCreateCustomSticker}
-              className="p-3.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-200/90 dark:border-cozydark-800 space-y-3"
+              className="p-3.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-200/90 dark:border-cozydark-750 space-y-3"
             >
               <div className="flex items-center gap-2">
                 <Plus className="w-4 h-4 text-blush-500" />
@@ -239,7 +239,7 @@ export const StickerPickerModal: React.FC<StickerPickerModalProps> = ({
                     placeholder="Sticker name (e.g. Sana Laughing, Azan's Coffee)..."
                     value={newStickerName}
                     onChange={(e) => setNewStickerName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none focus:ring-1 focus:ring-blush-300"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400"
                   />
                   <button
                     type="submit"
@@ -273,7 +273,7 @@ export const StickerPickerModal: React.FC<StickerPickerModalProps> = ({
                       onSelectSticker(stk);
                       onClose();
                     }}
-                    className="group relative flex flex-col items-center justify-center p-3 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850/80 hover:bg-blush-50 dark:hover:bg-blush-950/40 border border-cream-200/80 dark:border-cozydark-800 hover:border-blush-300 dark:hover:border-blush-700 transition-all cursor-pointer transform active:scale-95"
+                    className="group relative flex flex-col items-center justify-center p-3 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850/80 hover:bg-blush-50 dark:hover:bg-blush-950/40 border border-cream-200/80 dark:border-cozydark-750 hover:border-blush-300 dark:hover:border-blush-700 transition-all cursor-pointer transform active:scale-95"
                   >
                     <button
                       type="button"

@@ -43,7 +43,7 @@ export const SpecialDatesView: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl p-6 sm:p-7 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark">
+    <div className="rounded-3xl p-6 sm:p-7 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export const SpecialDatesView: React.FC = () => {
       {isAdding && (
         <form
           onSubmit={handleAdd}
-          className="p-4 mb-5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 space-y-3 animate-slide-up"
+          className="p-4 mb-5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 space-y-3 animate-slide-up"
         >
           <input
             type="text"
@@ -79,7 +79,7 @@ export const SpecialDatesView: React.FC = () => {
             placeholder="Event name (e.g. Sana's Birthday, Cabin Trip)"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs sm:text-sm text-cream-900 dark:text-cream-50 focus:outline-none focus:ring-1 focus:ring-blush-300"
+            className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400"
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -139,7 +139,7 @@ export const SpecialDatesView: React.FC = () => {
           return (
             <div
               key={d.id}
-              className="p-4 rounded-2xl bg-cream-100/60 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-800 flex items-center justify-between gap-3 group"
+              className="p-4 rounded-2xl bg-cream-100/60 dark:bg-cozydark-850 border border-cream-200/80 dark:border-cozydark-750 flex items-center justify-between gap-3 group"
             >
               <div>
                 <span className="text-[10px] font-medium uppercase tracking-wider text-blush-600 dark:text-blush-300 block mb-0.5">

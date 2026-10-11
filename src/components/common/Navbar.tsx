@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       {/* Top Header Bar */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-cream-50/85 dark:bg-cozydark-950/85 border-b border-cream-200/80 dark:border-cozydark-800/80 transition-colors">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-cream-50/85 dark:bg-cozydark-950/85 border-b border-cream-200/80 dark:border-cozydark-750 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           
           {/* Brand Logo */}
@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Desktop Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-1 bg-cream-200/50 dark:bg-cozydark-900/60 p-1 rounded-full border border-cream-200/70 dark:border-cozydark-800/70">
+          <nav className="hidden md:flex items-center gap-1 bg-cream-200/50 dark:bg-cozydark-900/60 p-1 rounded-full border border-cream-200/70 dark:border-cozydark-750">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {partnerProfile && (
               <div
                 onClick={() => setActiveTab('chat')}
-                className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-cream-100/90 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-800 text-xs cursor-pointer hover:border-blush-300 dark:hover:border-blush-700 transition-colors"
+                className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-cream-100/90 dark:bg-cozydark-850 border border-cream-200 dark:border-cozydark-750 text-xs cursor-pointer hover:border-blush-300 dark:hover:border-blush-700 transition-colors"
                 title={`Chat with ${partnerProfile.display_name}`}
               >
                 <Avatar
@@ -117,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="p-2 rounded-full text-cream-600 dark:text-cream-300 hover:bg-cream-200/60 dark:hover:bg-cozydark-800 transition-colors active:scale-95"
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-cream-600" />}
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-cream-600 dark:text-cream-300" />}
             </button>
 
             {/* Profile Avatar & Settings trigger */}
@@ -139,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Bottom Fixed Navigation Bar */}
       <nav
         aria-label="Mobile Navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl bg-cream-50/95 dark:bg-cozydark-950/95 border-t border-cream-200/80 dark:border-cozydark-800/80 px-2 py-1 flex justify-around items-center shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl bg-cream-50/95 dark:bg-cozydark-950/95 border-t border-cream-200/80 dark:border-cozydark-750 px-2 py-1 flex justify-around items-center shadow-lg"
       >
         {navItems.map((item) => {
           const Icon = item.icon;

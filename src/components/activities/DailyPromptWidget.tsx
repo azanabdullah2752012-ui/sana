@@ -42,7 +42,7 @@ export const DailyPromptWidget: React.FC = () => {
   const bothAnswered = myAnswer && partnerAnswer;
 
   return (
-    <div className="rounded-3xl p-6 sm:p-7 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark relative overflow-hidden">
+    <div className="rounded-3xl p-6 sm:p-7 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark relative overflow-hidden">
       {/* Background soft glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-blush-200/20 dark:bg-blush-900/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -71,7 +71,7 @@ export const DailyPromptWidget: React.FC = () => {
       </div>
 
       {/* Question */}
-      <div className="mb-6 p-4 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/70 dark:border-cozydark-800">
+      <div className="mb-6 p-4 rounded-2xl bg-cream-100/70 dark:bg-cozydark-850 border border-cream-200/70 dark:border-cozydark-750">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-blush-600 dark:text-blush-300 block mb-1">
           {prompt?.category || 'Question of the day'}
         </span>
@@ -84,7 +84,7 @@ export const DailyPromptWidget: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         {/* Current User's Answer Card */}
-        <div className="p-4 rounded-2xl bg-cream-100/40 dark:bg-cozydark-850/60 border border-cream-200/60 dark:border-cozydark-800 flex flex-col justify-between">
+        <div className="p-4 rounded-2xl bg-cream-100/40 dark:bg-cozydark-850/60 border border-cream-200/60 dark:border-cozydark-750 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export const DailyPromptWidget: React.FC = () => {
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   placeholder="Type your reflection here..."
-                  className="w-full p-2.5 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none focus:ring-1 focus:ring-blush-300"
+                  className="w-full p-2.5 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400"
                 />
                 <div className="flex justify-end gap-2">
                   {isEditing && (
@@ -146,7 +146,7 @@ export const DailyPromptWidget: React.FC = () => {
         </div>
 
         {/* Partner's Answer Card */}
-        <div className="p-4 rounded-2xl bg-cream-100/40 dark:bg-cozydark-850/60 border border-cream-200/60 dark:border-cozydark-800 flex flex-col justify-between">
+        <div className="p-4 rounded-2xl bg-cream-100/40 dark:bg-cozydark-850/60 border border-cream-200/60 dark:border-cozydark-750 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Avatar

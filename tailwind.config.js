@@ -59,14 +59,19 @@ export default {
           900: '#381A6B',
         },
         cozydark: {
-          950: '#121019',
-          900: '#191624',
-          850: '#211D30',
-          800: '#2B263F',
-          750: '#352F4E',
-          700: '#423B60',
-          600: '#5E5584',
-          500: '#8479B0',
+          950: '#0C0A0E', // True velvety obsidian background
+          900: '#141218', // Deep warm charcoal primary surface
+          850: '#1C1922', // Card & panel surface
+          800: '#25212E', // Elevated cards, active pills, inputs
+          750: '#312C3C', // Subtle borders
+          700: '#3F394D', // Prominent borders & dividers
+          650: '#524B63', // Hover states
+          600: '#6C6381', // Subtle icons
+          500: '#8E84A7', // Muted text
+          400: '#B6ACD0', // Secondary readable text
+          300: '#D6CDE9', // Primary body text
+          200: '#EDE7F7', // Bright crisp text
+          100: '#F7F4FC', // Pure highlight text
         }
       },
       fontFamily: {
@@ -81,8 +86,8 @@ export default {
       boxShadow: {
         'cozy': '0 4px 24px -2px rgba(220, 180, 190, 0.18)',
         'cozy-lg': '0 12px 36px -4px rgba(220, 180, 190, 0.25)',
-        'cozy-dark': '0 4px 24px -2px rgba(10, 8, 16, 0.5)',
-        'cozy-dark-lg': '0 12px 36px -4px rgba(10, 8, 16, 0.7)',
+        'cozy-dark': '0 4px 20px -2px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        'cozy-dark-lg': '0 12px 36px -4px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08)',
         'soft-glow': '0 0 25px rgba(246, 140, 174, 0.25)',
         'lavender-glow': '0 0 25px rgba(186, 155, 240, 0.25)',
       },

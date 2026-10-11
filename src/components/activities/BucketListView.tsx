@@ -50,7 +50,7 @@ export const BucketListView: React.FC = () => {
   });
 
   return (
-    <div className="rounded-3xl p-6 sm:p-7 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark">
+    <div className="rounded-3xl p-6 sm:p-7 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
@@ -84,7 +84,7 @@ export const BucketListView: React.FC = () => {
       {isAdding && (
         <form
           onSubmit={handleAdd}
-          className="p-4 mb-5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 space-y-3 animate-slide-up"
+          className="p-4 mb-5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 space-y-3 animate-slide-up"
         >
           <input
             type="text"
@@ -92,7 +92,7 @@ export const BucketListView: React.FC = () => {
             placeholder="What should we do together? e.g. Ceramic pottery workshop"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
-            className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none focus:ring-1 focus:ring-blush-300"
+            className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400"
           />
 
           <input
@@ -100,7 +100,7 @@ export const BucketListView: React.FC = () => {
             placeholder="Little details or notes (optional)..."
             value={newNotes}
             onChange={(e) => setNewNotes(e.target.value)}
-            className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none focus:ring-1 focus:ring-blush-300"
+            className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-cozydark-800 border border-cream-200 dark:border-cozydark-700 text-xs text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none focus:ring-1 focus:ring-blush-400"
           />
 
           <div className="flex flex-col sm:flex-row items-center gap-2 justify-between">

@@ -59,7 +59,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog Card */}
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} my-auto bg-cream-50 dark:bg-cozydark-900 rounded-3xl border border-cream-200 dark:border-cozydark-800 shadow-cozy-lg dark:shadow-cozy-dark-lg p-5 sm:p-7 overflow-hidden transition-all duration-300 animate-slide-up z-10`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} my-auto bg-cream-50 dark:bg-cozydark-900 rounded-3xl border border-cream-200/90 dark:border-cozydark-750 shadow-cozy-lg dark:shadow-cozy-dark-lg p-5 sm:p-7 overflow-hidden transition-all duration-300 animate-slide-up z-10`}
       >
         <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-cream-200/80 dark:border-cozydark-800/80">
           {title && <div className="text-lg sm:text-xl font-serif font-medium text-cream-900 dark:text-cream-50">{title}</div>}

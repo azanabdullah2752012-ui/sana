@@ -179,7 +179,7 @@ export const MemoryModal: React.FC<MemoryModalProps> = ({
             placeholder="e.g. Rainy Afternoon at the Corner Cafe"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300 dark:focus:ring-blush-600"
+            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50"
           />
         </div>
 
@@ -193,7 +193,7 @@ export const MemoryModal: React.FC<MemoryModalProps> = ({
             placeholder="What were we doing? What did we talk about? Why did it feel special?"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300 dark:focus:ring-blush-600"
+            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50"
           />
         </div>
 
@@ -210,7 +210,7 @@ export const MemoryModal: React.FC<MemoryModalProps> = ({
                 required
                 value={memoryDate}
                 onChange={(e) => setMemoryDate(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50"
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export const MemoryModal: React.FC<MemoryModalProps> = ({
                 placeholder="e.g. Botanic Gardens"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50"
               />
             </div>
           </div>

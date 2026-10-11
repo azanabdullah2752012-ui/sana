@@ -113,7 +113,7 @@ export const NoteModal: React.FC<NoteModalProps> = ({
             placeholder="e.g. Inside jokes from yesterday / Coffee order"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300"
+            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50"
           />
         </div>
 
@@ -128,7 +128,7 @@ export const NoteModal: React.FC<NoteModalProps> = ({
             placeholder="Write reminders, inside thoughts, quotes, or lists..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 placeholder-cream-400 text-sm focus:outline-none focus:ring-2 focus:ring-blush-300 font-sans"
+            className="w-full px-4 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 text-sm focus:outline-none focus:ring-2 focus:ring-blush-400/50 font-sans"
           />
         </div>
 
@@ -141,7 +141,7 @@ export const NoteModal: React.FC<NoteModalProps> = ({
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as NoteCategory)}
-              className="w-full px-3 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 text-cream-900 dark:text-cream-50 text-xs focus:outline-none focus:ring-2 focus:ring-blush-300"
+              className="w-full px-3 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 text-cream-900 dark:text-cream-50 text-xs focus:outline-none focus:ring-2 focus:ring-blush-400/50"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
@@ -155,7 +155,7 @@ export const NoteModal: React.FC<NoteModalProps> = ({
             <label className="block text-xs font-semibold uppercase tracking-wider text-cream-600 dark:text-cream-400 mb-1.5">
               Pin to Top
             </label>
-            <label className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-800 cursor-pointer text-xs text-cream-800 dark:text-cream-200">
+            <label className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-cream-100/80 dark:bg-cozydark-850 border border-cream-300/80 dark:border-cozydark-750 cursor-pointer text-xs text-cream-800 dark:text-cream-200">
               <input
                 type="checkbox"
                 checked={isPinned}

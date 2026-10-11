@@ -57,7 +57,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8 animate-fade-in">
       
       {/* 1. Welcoming Hero Banner */}
-      <div className="relative rounded-4xl p-7 sm:p-9 bg-gradient-to-br from-cream-50 via-blush-50/60 to-lavender-50/50 dark:from-cozydark-900 dark:via-blush-950/20 dark:to-lavender-950/20 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark overflow-hidden">
+      <div className="relative rounded-4xl p-7 sm:p-9 bg-gradient-to-br from-cream-50 via-blush-50/60 to-lavender-50/50 dark:from-cozydark-900 dark:via-blush-950/20 dark:to-lavender-950/20 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark overflow-hidden">
         {/* Soft Decorative Ambient Glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-blush-200/25 dark:bg-blush-900/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -159,7 +159,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Daily Reflection Teaser (2 cols) */}
-        <div className="md:col-span-2 rounded-3xl p-6 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark flex flex-col justify-between">
+        <div className="md:col-span-2 rounded-3xl p-6 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] uppercase font-semibold tracking-wider text-blush-600 dark:text-blush-300 px-2.5 py-0.5 rounded-full bg-blush-100/70 dark:bg-blush-950/60 border border-blush-200/60 dark:border-blush-800">
@@ -204,7 +204,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         </div>
 
         {/* Upcoming Countdown Card (1 col) */}
-        <div className="rounded-3xl p-6 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark flex flex-col justify-between">
+        <div className="rounded-3xl p-6 bg-cream-50 dark:bg-cozydark-900 border border-cream-200/90 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Calendar className="w-4 h-4 text-blush-400" />

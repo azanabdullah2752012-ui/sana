@@ -82,7 +82,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       )}
 
       {/* Main Input Bar */}
-      <div className="flex items-end gap-1.5 sm:gap-2 bg-cream-100 dark:bg-cozydark-850 p-1.5 rounded-3xl border border-cream-300/80 dark:border-cozydark-800 shadow-sm focus-within:ring-2 focus-within:ring-blush-300/50 dark:focus-within:ring-blush-600/50 transition-all">
+      <div className="flex items-end gap-1.5 sm:gap-2 bg-cream-100 dark:bg-cozydark-850 p-1.5 rounded-3xl border border-cream-300/80 dark:border-cozydark-750 shadow-sm focus-within:ring-2 focus-within:ring-blush-300/50 dark:focus-within:ring-blush-500/40 transition-all">
         {/* Stickers & GIF Action Buttons */}
         <div className="flex items-center pb-1 pl-1 gap-0.5 shrink-0">
           <button
@@ -99,7 +99,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             type="button"
             onClick={() => setGifModalOpen(true)}
             className="p-2 rounded-full text-cream-500 dark:text-cream-400 hover:text-blush-600 dark:hover:text-blush-300 hover:bg-cream-200/80 dark:hover:bg-cozydark-750 transition-all active:scale-95"
-            title="Search GIFs"
+            title="Search GIFs with KLIPY"
             aria-label="Open GIF picker"
           >
             <Film className="w-4 h-4 text-lavender-500" />
@@ -127,9 +127,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           value={content}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder="Write a message, share a sticker or GIF..."
+          placeholder="Write a message, share a sticker or KLIPY GIF..."
           rows={1}
-          className="flex-1 bg-transparent px-2.5 py-2 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 focus:outline-none resize-none max-h-32"
+          className="flex-1 bg-transparent px-2.5 py-2 text-xs sm:text-sm text-cream-900 dark:text-cream-50 placeholder-cream-400 dark:placeholder-cozydark-500 focus:outline-none resize-none max-h-32"
         />
 
         {/* Send Button */}
