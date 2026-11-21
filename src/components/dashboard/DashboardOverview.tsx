@@ -84,7 +84,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <p className="text-xs sm:text-sm text-cream-600 dark:text-cream-300 font-light leading-relaxed">
               {partnerProfile ? (
                 <>
-                  Connected with your bestie <strong>{partnerProfile.display_name}</strong>. Everything you share here is private, synchronized in real time, and protected by PostgreSQL Row Level Security.
+                  Connected with your bestie <strong>{partnerProfile.display_name}</strong>. Your private space for real-time thoughts, memories, and little daily moments.
                 </>
               ) : (
                 'Welcome to your private best friends space. Start a conversation or save a memory.'

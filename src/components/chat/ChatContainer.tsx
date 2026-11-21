@@ -8,7 +8,15 @@ import { Sparkles, Coffee, Lock, Image as ImageIcon } from 'lucide-react';
 import { ScreenshotPreviewModal } from './ScreenshotPreviewModal';
 import { compressImageFile } from '../../lib/images';
 
-export const ChatContainer: React.FC = () => {
+interface ChatContainerProps {
+  prefillMessage?: string | null;
+  onClearPrefill?: () => void;
+}
+
+export const ChatContainer: React.FC<ChatContainerProps> = ({
+  prefillMessage,
+  onClearPrefill,
+}) => {
   const { user, profile, partnerProfile, isPartnerOnline } = useAuth();
   const {
     messages,
@@ -68,7 +76,7 @@ export const ChatContainer: React.FC = () => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className="relative flex flex-col h-[calc(100dvh-8rem)] md:h-[calc(100vh-5rem)] max-w-4xl mx-2 sm:mx-auto rounded-2xl sm:rounded-3xl bg-cream-50/70 dark:bg-cozydark-900/70 border border-cream-200/80 dark:border-cozydark-750 shadow-cozy dark:shadow-cozy-dark overflow-hidden"
+      className="relative flex flex-col h-[calc(100dvh-7.5rem)] md:h-[calc(100vh-5rem)] max-w-4xl mx-auto rounded-2xl sm:rounded-3xl bg-white/60 dark:bg-[#0E0C12]/80 border border-cream-200/80 dark:border-cozydark-800 shadow-cozy dark:shadow-cozy-dark overflow-hidden backdrop-blur-md"
     >
       {/* Drag & Drop Overlay */}
       {isDraggingOver && (
@@ -80,57 +88,13 @@ export const ChatContainer: React.FC = () => {
             Drop screenshot or photo here
           </h3>
           <p className="text-xs text-cream-600 dark:text-cream-300 mt-1">
-            We will preview it before sending to your bestie 🌸
+            Preview before sending 🌸
           </p>
         </div>
       )}
 
-      {/* Chat Header */}
-      <div className="px-4 sm:px-5 py-3.5 bg-cream-100/90 dark:bg-cozydark-850/90 border-b border-cream-200/80 dark:border-cozydark-750 flex items-center justify-between backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <Avatar
-            name={partnerProfile?.display_name || 'Bestie'}
-            url={partnerProfile?.avatar_url}
-            size="md"
-            showStatus={true}
-            isOnline={isPartnerOnline}
-          />
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-serif font-semibold text-sm sm:text-base text-cream-900 dark:text-cream-50">
-                {partnerProfile?.display_name || 'Bestie'} &amp; {profile?.display_name || 'You'}
-              </h2>
-              <Sparkles className="w-3.5 h-3.5 text-blush-400" />
-            </div>
-
-            {/* Status or WhatsApp Typing Indicator in Header */}
-            {isPartnerTyping ? (
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5 animate-pulse">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>typing... 💬</span>
-              </p>
-            ) : isPartnerOnline ? (
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Active now ✨ • Private</span>
-              </p>
-            ) : (
-              <p className="text-xs text-cream-500 dark:text-cream-400 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cream-400 dark:bg-cozydark-600" />
-                <span>Offline • Private</span>
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="hidden sm:flex items-center gap-2 text-xs text-cream-500 dark:text-cream-400 bg-cream-200/60 dark:bg-cozydark-800 px-3 py-1 rounded-full border border-cream-200 dark:border-cozydark-700">
-          <Lock className="w-3 h-3 text-blush-500" />
-          <span>RLS Protected</span>
-        </div>
-      </div>
-
       {/* Messages Stream */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-1">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-1">
         {loading && messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-cream-400 dark:text-cream-500 gap-2">
             <span className="w-6 h-6 border-2 border-blush-400 border-t-transparent rounded-full animate-spin" />
@@ -190,9 +154,9 @@ export const ChatContainer: React.FC = () => {
                 />
                 <div className="px-4 py-2.5 rounded-2.5xl rounded-bl-xs bg-white dark:bg-cozydark-800 border border-cream-200/80 dark:border-cozydark-700 shadow-xs flex items-center gap-2">
                   <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-blush-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-blush-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-blush-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-blush-500 animate-typing-dot" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-blush-500 animate-typing-dot" style={{ animationDelay: '200ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-blush-500 animate-typing-dot" style={{ animationDelay: '400ms' }} />
                   </div>
                   <span className="text-xs text-cream-600 dark:text-cream-400 italic">
                     {partnerProfile?.display_name || 'Bestie'} is typing...
@@ -214,6 +178,8 @@ export const ChatContainer: React.FC = () => {
         onTyping={sendTypingSignal}
         replyingTo={replyingTo}
         onCancelReply={() => setReplyingTo(null)}
+        prefillContent={prefillMessage}
+        onClearPrefill={onClearPrefill}
       />
 
       {/* Dropped Screenshot Preview Modal */}

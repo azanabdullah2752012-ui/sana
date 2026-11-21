@@ -96,8 +96,13 @@ export default {
         'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'float-slow': 'float 6s ease-in-out infinite',
         'pulse-subtle': 'pulseSubtle 3s ease-in-out infinite',
+        'typing-dot': 'typingDot 1.4s ease-in-out infinite',
       },
       keyframes: {
+        typingDot: {
+          '0%, 80%, 100%': { opacity: '0.35', transform: 'scale(0.85)' },
+          '40%': { opacity: '1', transform: 'scale(1.15)' },
+        },
         fadeIn: {
           '0%': { opacity: '0', transform: 'scale(0.98)' },
           '100%': { opacity: '1', transform: 'scale(1)' },

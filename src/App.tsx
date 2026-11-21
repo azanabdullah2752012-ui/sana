@@ -5,7 +5,6 @@ import { ToastProvider, useToast } from './components/common/Toast';
 import { Navbar, ActiveTab } from './components/common/Navbar';
 import { LandingPage } from './components/landing/LandingPage';
 import { AccessDeniedScreen } from './components/common/AccessDeniedScreen';
-import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { MemoriesView } from './components/memories/MemoriesView';
 import { NotesView } from './components/notes/NotesView';
@@ -16,8 +15,14 @@ import { Sparkles, Heart } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const { user, isApproved, isLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('chat');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [chatPrefillMessage, setChatPrefillMessage] = useState<string | null>(null);
+
+  const handleSendToChat = (text: string) => {
+    setChatPrefillMessage(text);
+    setActiveTab('chat');
+  };
 
   // 1. Loading state with gentle aesthetic animation
   if (isLoading) {
@@ -61,16 +66,12 @@ const AppContent: React.FC = () => {
 
       {/* Main View Area */}
       <main className="flex-1 w-full relative z-10">
-        {activeTab === 'dashboard' && (
-          <DashboardOverview
-            setActiveTab={setActiveTab}
-            onSendToChat={(text) => {
-              setActiveTab('chat');
-            }}
+        {activeTab === 'chat' && (
+          <ChatContainer
+            prefillMessage={chatPrefillMessage}
+            onClearPrefill={() => setChatPrefillMessage(null)}
           />
         )}
-
-        {activeTab === 'chat' && <ChatContainer />}
 
         {activeTab === 'memories' && <MemoriesView />}
 
@@ -78,9 +79,7 @@ const AppContent: React.FC = () => {
 
         {activeTab === 'activities' && (
           <ActivitiesView
-            onSendToChat={(text) => {
-              setActiveTab('chat');
-            }}
+            onSendToChat={handleSendToChat}
           />
         )}
       </main>

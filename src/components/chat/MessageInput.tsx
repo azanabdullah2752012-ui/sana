@@ -17,6 +17,8 @@ interface MessageInputProps {
   onTyping: (isTyping: boolean) => void;
   replyingTo: Message | null;
   onCancelReply: () => void;
+  prefillContent?: string | null;
+  onClearPrefill?: () => void;
 }
 
 const QUICK_EMOJIS = ['🌸', '✨', '💖', '☕', '🍰', '🥰', '🥺', '🫂', '😂', '🎉', '🐱', '🧋', '🍓', '🔥'];
@@ -28,6 +30,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onTyping,
   replyingTo,
   onCancelReply,
+  prefillContent,
+  onClearPrefill,
 }) => {
   const [content, setContent] = useState('');
   const [stickerModalOpen, setStickerModalOpen] = useState(false);
@@ -50,6 +54,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       textareaRef.current.focus();
     }
   }, [replyingTo]);
+
+  useEffect(() => {
+    if (prefillContent) {
+      setContent(prefillContent);
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+      onClearPrefill?.();
+    }
+  }, [prefillContent, onClearPrefill]);
 
   // Handle typing signal with debouncing
   const handleTypingEvent = () => {

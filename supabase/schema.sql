@@ -195,14 +195,17 @@ INSERT INTO public.conversations (id, title)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Sana & Azan')
 ON CONFLICT (id) DO NOTHING;
 
+-- Safely insert initial prompt if not already present
 INSERT INTO public.daily_prompts (id, prompt_date, question, category)
-VALUES (
+SELECT 
   'prompt-initial-01',
   CURRENT_DATE,
   'What is a quiet, simple thing from this week that made you unexpectedly happy?',
   'cozy reflection'
-)
-ON CONFLICT (prompt_date) DO NOTHING;
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.daily_prompts 
+  WHERE id = 'prompt-initial-01' OR prompt_date = CURRENT_DATE
+);
 
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES (With Safe DROP POLICY IF EXISTS)
